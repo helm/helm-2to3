@@ -5,6 +5,12 @@ VERSION := $(shell sed -n -e 's/version:[ "]*\([^"]*\).*/\1/p' plugin.yaml)
 DIST := $(CURDIR)/_dist
 LDFLAGS := "-X main.version=${VERSION}"
 
+PHONY: modules
+modules:
+	export GOPROXY=https://gocenter.io && \
+	export GO111MODULE=on && \
+	go mod download
+
 PHONY: build
 build:
 	go build -o bin/${HELM_PLUGIN_NAME} -ldflags $(LDFLAGS) ./main.go
