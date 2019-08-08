@@ -15,6 +15,7 @@ $ helm 2to3 convert [flags] RELEASE
 ```
       --dry-run            simulate a convert
   -h, --help               help for convert
+      --keep-v2-releases   v2 releases are retained after migration. By default, the v2 releases are removed
   -l, --label string       label to select tiller resources by (default "OWNER=TILLER")
   -t, --tiller-ns string   namespace of Tiller (default "kube-system")
 ```
