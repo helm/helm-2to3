@@ -3,14 +3,27 @@ module helm-2to3
 go 1.12
 
 require (
+	github.com/Masterminds/goutils v1.1.0 // indirect
+	github.com/Masterminds/semver v1.4.2 // indirect
+	github.com/Masterminds/sprig v2.20.0+incompatible // indirect
 	github.com/deislabs/oras v0.5.0 // indirect
+	github.com/fatih/color v1.7.0 // indirect
+	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/golang/protobuf v1.3.1
+	github.com/gosuri/uitable v0.0.3 // indirect
+	github.com/huandu/xstrings v1.2.0 // indirect
+	github.com/jmoiron/sqlx v1.2.0 // indirect
+	github.com/lib/pq v1.2.0 // indirect
 	github.com/maorfr/helm-plugin-utils v0.0.0-20181205064038-588190cb5e3b
+	github.com/mattn/go-colorable v0.1.2 // indirect
+	github.com/mattn/go-runewidth v0.0.4 // indirect
+	github.com/rubenv/sql-migrate v0.0.0-20190717103323-87ce952f7079 // indirect
 	github.com/spf13/cobra v0.0.3
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.1.0 // indirect
-	helm.sh/helm v0.0.0-00010101000000-000000000000
+	gopkg.in/gorp.v1 v1.7.2 // indirect
+	helm.sh/helm v3.0.0-alpha.2+incompatible
 	k8s.io/apimachinery v0.0.0
 	k8s.io/cli-runtime v0.0.0
 	k8s.io/helm v2.14.2+incompatible
@@ -18,7 +31,6 @@ require (
 )
 
 replace (
-	helm.sh/helm => /home/usr1/go/src/helm.sh/helm
 	k8s.io/api => k8s.io/api v0.0.0-20190620084959-7cf5895f2711
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190620085554-14e95df34f1f
 	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190612205821-1799e75a0719
