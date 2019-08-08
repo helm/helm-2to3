@@ -13,7 +13,7 @@ $ helm 2to3 convert [flags] RELEASE
 ### Flags:
 
 ```
-   --dry-run               simulate a convert
+      --dry-run            simulate a convert
   -h, --help               help for convert
   -l, --label string       label to select tiller resources by (default "OWNER=TILLER")
   -t, --tiller-ns string   namespace of Tiller (default "kube-system")
@@ -27,17 +27,13 @@ $ helm 2to3 convert [flags] RELEASE
 
 If you would like to handle the build yourself, this is how recommend doing it.
 
-First, set up your environment:
-
-- You need to have [Go](http://golang.org) installed. Make sure to set `$GOPATH`
-
-Clone this repo into a directory, for example your `$GOPATH`. You can use `go get -d github.com/hickeyma/helm-2to3`
-for that.
+You must first have [Go](http://golang.org) installed , and then you run:
 
 ```
-$ cd $GOPATH/src/github.com/hickeyma/helm-2to3
-$ make build
-$ helm plugin install $GOPATH/src/github.com/hickeyma/helm-2to3
+$ git clone git@github.com:hickeyma/helm-2to3.git
+$ cd helm-2to3
+$ make
+$ helm plugin install <your_path>/helm-2to3
 ```
 
 That last command will use the binary that you built.
