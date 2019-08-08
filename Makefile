@@ -7,8 +7,8 @@ LDFLAGS := "-X main.version=${VERSION}"
 MOD_PROXY_URL ?= https://gocenter.io
 
 PHONY: bootstrap
-bootstrap: 
-    export GO111MODULE=on && \
+bootstrap:
+	export GO111MODULE=on && \
     export GOPROXY=$(MOD_PROXY_URL) && \
 	go mod download
 
