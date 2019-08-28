@@ -10,8 +10,7 @@ PHONY: bootstrap
 bootstrap:
 	export GO111MODULE=on && \
 	export GOPROXY=$(MOD_PROXY_URL) && \
-	go mod download && \
-	export GOOS=darwin && export GOARCH=amd64
+	go mod download
 PHONY: build
 build:
-	env GOOS=darwin GOARCH=amd64 go build -o bin/${HELM_PLUGIN_NAME} -ldflags $(LDFLAGS) ./main.go
+	go build -o bin/${HELM_PLUGIN_NAME} -ldflags $(LDFLAGS) ./main.go
