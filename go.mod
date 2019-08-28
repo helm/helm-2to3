@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.4.2 // indirect
 	github.com/Masterminds/sprig v2.20.0+incompatible // indirect
-	github.com/deislabs/oras v0.5.0 // indirect
+	github.com/deislabs/oras v0.7.0+incompatible //indirect
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/golang/protobuf v1.3.1
@@ -23,7 +23,7 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.1.0 // indirect
 	gopkg.in/gorp.v1 v1.7.2 // indirect
-	helm.sh/helm v3.0.0-alpha.2+incompatible
+	helm.sh/helm v3.0.0-beta.1+incompatible
 	k8s.io/apimachinery v0.0.0
 	k8s.io/cli-runtime v0.0.0
 	k8s.io/helm v2.14.2+incompatible
@@ -31,6 +31,7 @@ require (
 )
 
 replace (
+	github.com/docker/docker => github.com/docker/docker v0.0.0-20190731150326-928381b2215c
 	k8s.io/api => k8s.io/api v0.0.0-20190620084959-7cf5895f2711
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.0.0-20190620085554-14e95df34f1f
 	k8s.io/apimachinery => k8s.io/apimachinery v0.0.0-20190612205821-1799e75a0719
