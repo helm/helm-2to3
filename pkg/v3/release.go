@@ -234,6 +234,7 @@ func mapHooks(v2Hooks []*v2rls.Hook) ([]*release.Hook, error) {
 			return nil, err
 		}
 		hook.DeletePolicies = policies
+		//TODO: hook.LastRun =
 		hooks = append(hooks, hook)
 	}
 	return hooks, nil
@@ -252,6 +253,7 @@ func mapHookEvents(v2HookEvents []v2rls.Hook_Event) ([]release.HookEvent, error)
 		event := release.HookEvent(strings.ToLower(v2EventStr))
 		hookEvents = append(hookEvents, event)
 	}
+	//TODO: hook.LastRun =
 	return hookEvents, nil
 }
 
