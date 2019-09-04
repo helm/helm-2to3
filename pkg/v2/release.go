@@ -22,22 +22,30 @@ import (
 	utils "github.com/maorfr/helm-plugin-utils/pkg"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-        rls "k8s.io/helm/pkg/proto/hapi/release"
+	rls "k8s.io/helm/pkg/proto/hapi/release"
 )
 
+type RetrieveOptions struct {
+	ReleaseName      string
+	StorageType      string
+	TillerLabel      string
+	TillerNamespace  string
+	TillerOutCluster bool
+}
+
+type DeleteOptions struct {
+	DryRun   bool
+	Versions []int32
+}
+
 // GetReleaseVersions returns all rrelease versions from Helm v2 storage for a specified release
-func GetReleaseVersions(releaseName, tillerNamespace, label  string) ([]*rls.Release, error) {
-	listOptions := utils.ListOptions{
-		ReleaseName:     releaseName,
-		TillerNamespace: tillerNamespace,
-		TillerLabel:     label,
-	}
-	releases, err := getReleases(listOptions)
+func GetReleaseVersions(retOpts RetrieveOptions) ([]*rls.Release, error) {
+	releases, err := getReleases(retOpts)
 	if err != nil {
 		return nil, err
 	}
 	if len(releases) <= 0 {
-		return nil, fmt.Errorf("%s has no deployed releases", releaseName)
+		return nil, fmt.Errorf("%s has no deployed releases", retOpts.ReleaseName)
 	}
 
 	return releases, nil
@@ -45,38 +53,46 @@ func GetReleaseVersions(releaseName, tillerNamespace, label  string) ([]*rls.Rel
 }
 
 // DeleteReleaseVersions deletes all release data from Helm v2 storage for a specified release
-func DeleteReleaseVersions(releaseName, tillerNamespace string, versions []int32, dryRun bool) error {
-	for _, ver := range versions {
-		relVerName := fmt.Sprintf("%s.v%d", releaseName, ver)
-                fmt.Printf("[Helm 2] ReleaseVersion \"%s\" will be deleted.\n", fmt.Sprintf("%s.v%d", releaseName, ver))
-		if ! dryRun {
-                        if err := deleteRelease(relVerName, tillerNamespace); err != nil {
-                                return fmt.Errorf("[Helm 2] ReleaseVersion \"%s\" failed to delete with error: %s.\n", fmt.Sprintf("%s.v%d", releaseName, ver), err)
-                        }
-                        fmt.Printf("[Helm 2] ReleaseVersion \"%s\" deleted.\n", fmt.Sprintf("%s.v%d", releaseName, ver))
+func DeleteReleaseVersions(retOpts RetrieveOptions, delOpts DeleteOptions) error {
+	for _, ver := range delOpts.Versions {
+		relVerName := fmt.Sprintf("%s.v%d", retOpts.ReleaseName, ver)
+		fmt.Printf("[Helm 2] ReleaseVersion \"%s\" will be deleted.\n", relVerName)
+		if !delOpts.DryRun {
+			if err := deleteRelease(retOpts, relVerName); err != nil {
+				return fmt.Errorf("[Helm 2] ReleaseVersion \"%s\" failed to delete with error: %s.\n", relVerName, err)
+			}
+			fmt.Printf("[Helm 2] ReleaseVersion \"%s\" deleted.\n", relVerName)
 		}
-        }
+	}
 
 	return nil
 }
 
-func getReleases(o utils.ListOptions) ([]*rls.Release, error) {
-	if o.TillerNamespace == "" {
-		o.TillerNamespace = "kube-system"
+func getReleases(retOpts RetrieveOptions) ([]*rls.Release, error) {
+	if retOpts.TillerNamespace == "" {
+		retOpts.TillerNamespace = "kube-system"
 	}
-	if o.TillerLabel == "" {
-		o.TillerLabel = "OWNER=TILLER"
+	if retOpts.TillerLabel == "" {
+		retOpts.TillerLabel = "OWNER=TILLER"
 	}
-	if o.ReleaseName != "" {
-		o.TillerLabel += fmt.Sprintf(",NAME=%s", o.ReleaseName)
+	if retOpts.ReleaseName != "" {
+		retOpts.TillerLabel += fmt.Sprintf(",NAME=%s", retOpts.ReleaseName)
+	}
+	if retOpts.StorageType == "" {
+		retOpts.StorageType = "configmaps"
 	}
 	clientSet := utils.GetClientSet()
+	var storage string
+	if !retOpts.TillerOutCluster {
+		storage = utils.GetTillerStorage(retOpts.TillerNamespace)
+	} else {
+		storage = retOpts.StorageType
+	}
 	var releases []*rls.Release
-	storage := utils.GetTillerStorage(o.TillerNamespace)
 	switch storage {
 	case "secrets":
-		secrets, err := clientSet.CoreV1().Secrets(o.TillerNamespace).List(metav1.ListOptions{
-			LabelSelector: o.TillerLabel,
+		secrets, err := clientSet.CoreV1().Secrets(retOpts.TillerNamespace).List(metav1.ListOptions{
+			LabelSelector: retOpts.TillerLabel,
 		})
 		if err != nil {
 			return nil, err
@@ -89,8 +105,8 @@ func getReleases(o utils.ListOptions) ([]*rls.Release, error) {
 			releases = append(releases, release)
 		}
 	case "configmaps":
-		configMaps, err := clientSet.CoreV1().ConfigMaps(o.TillerNamespace).List(metav1.ListOptions{
-			LabelSelector: o.TillerLabel,
+		configMaps, err := clientSet.CoreV1().ConfigMaps(retOpts.TillerNamespace).List(metav1.ListOptions{
+			LabelSelector: retOpts.TillerLabel,
 		})
 		if err != nil {
 			return nil, err
@@ -116,18 +132,26 @@ func getRelease(itemReleaseData string) *rls.Release {
 	return data
 }
 
-func deleteRelease(releaseVersionName, tillerNamespace string)  error {
-	if tillerNamespace == "" {
-		tillerNamespace = "kube-system"
+func deleteRelease(retOpts RetrieveOptions, releaseVersionName string) error {
+	if retOpts.TillerNamespace == "" {
+		retOpts.TillerNamespace = "kube-system"
 	}
-        clientSet := utils.GetClientSet()
-        storage := utils.GetTillerStorage(tillerNamespace)
-        switch storage {
-        case "secrets":
-                return clientSet.CoreV1().Secrets(tillerNamespace).Delete(releaseVersionName, &metav1.DeleteOptions{})
-        case "configmaps":
-                return clientSet.CoreV1().ConfigMaps(tillerNamespace).Delete(releaseVersionName, &metav1.DeleteOptions{})
-        }
+	if retOpts.StorageType == "" {
+		retOpts.StorageType = "configmaps"
+	}
+	clientSet := utils.GetClientSet()
+	var storage string
+	if !retOpts.TillerOutCluster {
+		storage = utils.GetTillerStorage(retOpts.TillerNamespace)
+	} else {
+		storage = retOpts.StorageType
+	}
+	switch storage {
+	case "secrets":
+		return clientSet.CoreV1().Secrets(retOpts.TillerNamespace).Delete(releaseVersionName, &metav1.DeleteOptions{})
+	case "configmaps":
+		return clientSet.CoreV1().ConfigMaps(retOpts.TillerNamespace).Delete(releaseVersionName, &metav1.DeleteOptions{})
+	}
 	return nil
 }
 
