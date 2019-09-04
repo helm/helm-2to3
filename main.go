@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 package main
-  
+
 import (
 	"os"
 
@@ -25,7 +25,7 @@ import (
 func main() {
 	migrateCmd := cmd.NewRootCmd(os.Stdout, os.Args[1:])
 
-        if err := migrateCmd.Execute(); err != nil {
-                os.Exit(1)
-        }
+	if err := migrateCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }

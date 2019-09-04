@@ -15,33 +15,33 @@ limitations under the License.
 */
 
 package v3
-  
+
 import (
-        "fmt"
-        "log"
-        "os"
+	"fmt"
+	"log"
+	"os"
 	"sync"
-        
-        "k8s.io/cli-runtime/pkg/genericclioptions"
+
+	"k8s.io/cli-runtime/pkg/genericclioptions"
 
 	"helm.sh/helm/pkg/action"
 	"helm.sh/helm/pkg/cli"
-        "helm.sh/helm/pkg/kube"
-        "helm.sh/helm/pkg/storage"
-        "helm.sh/helm/pkg/storage/driver"
+	"helm.sh/helm/pkg/kube"
+	"helm.sh/helm/pkg/storage"
+	"helm.sh/helm/pkg/storage/driver"
 )
 
 var (
-        settings   cli.EnvSettings
-        config     genericclioptions.RESTClientGetter
-        configOnce sync.Once
+	settings   cli.EnvSettings
+	config     genericclioptions.RESTClientGetter
+	configOnce sync.Once
 )
 
 // GetActionConfig returns action configuration based on Helm env
 func GetActionConfig(namespace string) (*action.Configuration, error) {
 	actionConfig := new(action.Configuration)
 
-        // Initialize the rest of the actionConfig
+	// Initialize the rest of the actionConfig
 	err := initActionConfig(actionConfig, namespace)
 	if err != nil {
 		return nil, err
@@ -51,49 +51,49 @@ func GetActionConfig(namespace string) (*action.Configuration, error) {
 }
 
 func initActionConfig(actionConfig *action.Configuration, namespace string) error {
-        kc := kube.New(kubeConfig())
-        kc.Log = logf
+	kc := kube.New(kubeConfig())
+	kc.Log = logf
 
-        clientset, err := kc.Factory.KubernetesClientSet()
-        if err != nil {
-                return err
-        }
+	clientset, err := kc.Factory.KubernetesClientSet()
+	if err != nil {
+		return err
+	}
 
-        var store *storage.Storage
-        switch os.Getenv("HELM_DRIVER") {
-        case "secret", "secrets", "":
-                d := driver.NewSecrets(clientset.CoreV1().Secrets(namespace))
-                d.Log = logf
-                store = storage.Init(d)
-        case "configmap", "configmaps":
-                d := driver.NewConfigMaps(clientset.CoreV1().ConfigMaps(namespace))
-                d.Log = logf
-                store = storage.Init(d)
-        case "memory":
-                d := driver.NewMemory()
-                store = storage.Init(d)
-        default:
-                return fmt.Errorf("Unknown driver in HELM_DRIVER: " + os.Getenv("HELM_DRIVER"))
-        }
+	var store *storage.Storage
+	switch os.Getenv("HELM_DRIVER") {
+	case "secret", "secrets", "":
+		d := driver.NewSecrets(clientset.CoreV1().Secrets(namespace))
+		d.Log = logf
+		store = storage.Init(d)
+	case "configmap", "configmaps":
+		d := driver.NewConfigMaps(clientset.CoreV1().ConfigMaps(namespace))
+		d.Log = logf
+		store = storage.Init(d)
+	case "memory":
+		d := driver.NewMemory()
+		store = storage.Init(d)
+	default:
+		return fmt.Errorf("Unknown driver in HELM_DRIVER: " + os.Getenv("HELM_DRIVER"))
+	}
 
-        actionConfig.RESTClientGetter = kubeConfig()
-        actionConfig.KubeClient = kc
-        actionConfig.Releases = store
-        actionConfig.Log = logf
+	actionConfig.RESTClientGetter = kubeConfig()
+	actionConfig.KubeClient = kc
+	actionConfig.Releases = store
+	actionConfig.Log = logf
 
 	return nil
 }
 
 func kubeConfig() genericclioptions.RESTClientGetter {
-        configOnce.Do(func() {
-                config = kube.GetConfig(settings.KubeConfig, settings.KubeContext, settings.Namespace)
-        })
-        return config
+	configOnce.Do(func() {
+		config = kube.GetConfig(settings.KubeConfig, settings.KubeContext, settings.Namespace)
+	})
+	return config
 }
 
 func logf(format string, v ...interface{}) {
-        if settings.Debug {
-                format = fmt.Sprintf("[debug] %s\n", format)
-                log.Output(2, fmt.Sprintf(format, v...))
-        }
+	if settings.Debug {
+		format = fmt.Sprintf("[debug] %s\n", format)
+		log.Output(2, fmt.Sprintf(format, v...))
+	}
 }

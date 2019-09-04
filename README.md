@@ -17,7 +17,9 @@ $ helm 2to3 convert [flags] RELEASE
   -h, --help               help for convert
       --keep-v2-releases   v2 releases are retained after migration. By default, the v2 releases are removed
   -l, --label string       label to select tiller resources by (default "OWNER=TILLER")
-  -t, --tiller-ns string   namespace of Tiller (default "kube-system")
+  -s, --release-storage string   v2 release storage type/object. It can be 'configmaps' or 'secrets'. This is only used with the 'tiller-out-cluster' flag (default "configmaps")
+  -t, --tiller-ns string   namespace of Tiller (default "kube-system")A
+      --tiller-out-cluster       when  Tiller is not running in the cluster e.g. Tillerless
 ```
 
 ## Install
@@ -26,7 +28,7 @@ $ helm 2to3 convert [flags] RELEASE
 
 ### Developer (From Source) Install
 
-If you would like to handle the build yourself, this is how recommend doing it.
+If you would like to handle the build yourself, this is the recommended way to do it.
 
 You must first have [Go](http://golang.org) installed , and then you run:
 
