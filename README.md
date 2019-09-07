@@ -12,7 +12,7 @@ Migrate Helm v2 releases in-place to Helm v3
 $ helm 2to3 convert [flags] RELEASE
 ```
 
-### Flags:
+### Flags
 
 ```
       --dry-run            simulate a convert
