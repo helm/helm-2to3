@@ -2,9 +2,11 @@
 
 This is a Helm plugin which migrates Helm v2 releases in-place to Helm v3
 
+*Note:* Helm v3 needs to be installed.
+
 ## Usage
 
-migrate Helm v2 releases in-place to Helm v3
+Migrate Helm v2 releases in-place to Helm v3
 
 ```
 $ helm 2to3 convert [flags] RELEASE
@@ -24,7 +26,13 @@ $ helm 2to3 convert [flags] RELEASE
 
 ## Install
 
-**TODO**
+Based on the version in `plugin.yaml`, release binary will be downloaded from GitHub:
+
+```
+$ helm plugin install https://github.com/hickeyma/helm-2to3
+Downloading and installing helm-2to3 v0.1.0 ...
+https://github.com/hickeyma/helm-2to3/releases/download/v0.1.0/helm-linter_0.1.0_darwin_amd64.tar.gz
+Installed plugin
 
 ### Developer (From Source) Install
 

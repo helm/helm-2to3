@@ -1,0 +1,24 @@
+env:
+  - GO111MODULE=on
+  - GOPROXY=https://goproxy.io
+before:
+  hooks:
+    - go mod download
+builds:
+  - main: main.go
+    binary: 2to3
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+archive:
+  format: tar.gz
+  files:
+    - LICENSE
+    - plugin.yaml
+checksum:
+  name_template: 'checksums.txt'
