@@ -13,14 +13,14 @@ jobs:
   untagged-build:
     docker:
       - image: circleci/golang:1.13
-    working_directory: /go/src/github.com/rimusz/helm-2to3
+    working_directory: /go/src/github.com/hickeyma/helm-2to3
     steps:
       - checkout
       - run: make build
   tagged-build:
     docker:
       - image: circleci/golang:1.13
-    working_directory: /go/src/github.com/rimusz/helm-2to3
+    working_directory: /go/src/github.com/hickeyma/helm-2to3
     steps:
       - checkout
       - run: curl -sL https://raw.githubusercontent.com/goreleaser/get/master/get | VERSION=v0.117.2 bash
