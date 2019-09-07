@@ -71,7 +71,7 @@ func run(cmd *cobra.Command, args []string) error {
 	return Convert(releaseName)
 }
 
-// Convert coonverts helm 2 release into Hlem 3 relesae. It maps the Helm v2 release versions
+// Convert converts helm 2 release into Helm 3 release. It maps the Helm v2 release versions
 // of the release into Helm v3 equivalent and stores the release versions. The underlying  Kubernetes resources
 // are untouched. Note: The namespaces of each release version need to exist in the Kubernetes  cluster.
 // The Helm 2 release is deleted by default, unless the '--keepv2Releases' flag is set.

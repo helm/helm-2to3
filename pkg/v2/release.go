@@ -38,7 +38,7 @@ type DeleteOptions struct {
 	Versions []int32
 }
 
-// GetReleaseVersions returns all rrelease versions from Helm v2 storage for a specified release
+// GetReleaseVersions returns all release versions from Helm v2 storage for a specified release
 func GetReleaseVersions(retOpts RetrieveOptions) ([]*rls.Release, error) {
 	releases, err := getReleases(retOpts)
 	if err != nil {
