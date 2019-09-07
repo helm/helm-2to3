@@ -24,7 +24,7 @@ $ helm 2to3 convert [flags] RELEASE
       --tiller-out-cluster       when  Tiller is not running in the cluster e.g. Tillerless
 ```
 
-## Install
+### Install
 
 Based on the version in `plugin.yaml`, release binary will be downloaded from GitHub:
 
