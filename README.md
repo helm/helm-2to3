@@ -33,6 +33,7 @@ $ helm plugin install https://github.com/hickeyma/helm-2to3
 Downloading and installing helm-2to3 v0.1.0 ...
 https://github.com/hickeyma/helm-2to3/releases/download/v0.1.0/helm-linter_0.1.0_darwin_amd64.tar.gz
 Installed plugin
+```
 
 ### Developer (From Source) Install
 
