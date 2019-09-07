@@ -31,8 +31,8 @@ Based on the version in `plugin.yaml`, release binary will be downloaded from Gi
 ```
 $ helm plugin install https://github.com/hickeyma/helm-2to3
 Downloading and installing helm-2to3 v0.1.0 ...
-https://github.com/hickeyma/helm-2to3/releases/download/v0.1.0/helm-linter_0.1.0_darwin_amd64.tar.gz
-Installed plugin
+https://github.com/hickeyma/helm-2to3/releases/download/v0.1.0/helm-2to3_0.1.0_darwin_amd64.tar.gz
+Installed plugin: 2to3
 ```
 
 ### Developer (From Source) Install
