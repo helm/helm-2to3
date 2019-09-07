@@ -14,6 +14,7 @@ bootstrap:
 
 .PHONY: build
 build:
+	export CGO_ENABLED=0 && \
 	go build -o bin/${HELM_PLUGIN_NAME} -ldflags $(LDFLAGS) ./main.go
 
 .PHONY: tag

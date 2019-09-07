@@ -16,7 +16,7 @@ jobs:
     working_directory: /go/src/github.com/rimusz/helm-2to3
     steps:
       - checkout
-      - run: make build_linux
+      - run: make build
   tagged-build:
     docker:
       - image: circleci/golang:1.13
