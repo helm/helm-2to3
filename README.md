@@ -1,20 +1,43 @@
 # Helm 2to3 Plugin
 
-This is a Helm plugin which migrates Helm v2 releases in-place to Helm v3
+This is a Helm plugin which migrates Helm v2 repositories and releases in-place to Helm v3
 
-*Note:* Helm v3 needs to be installed.
+*Note:* Helm v3 cli needs to be installed.
 
 ## Usage
 
-Migrate Helm v2 releases in-place to Helm v3
+### Migrate Helm v2 repositories
+
+Migrate Helm v2 repositories in-place to Helm v3:
+
+```console
+$ helm 2to3 move config [flags]
+```
+
+Flags:
 
 ```
+  -h, --help     help for move
+```
+
+For migration it uses default Helm v2 home and v3 repositories config folders.
+To override those folders you need to set environment variables `HELM_V2_HOME` and `HELM_V3_CONFIG`:
+
+```console
+$ export HELM_V2_HOME=$PWD/.helm2
+$ export HELM_V3_CONFIG=$PWD/.helm3
+$ helm 2to3 move config
+```
+
+### Migrate Helm v2 releases
+
+Migrate Helm v2 releases in-place to Helm v3:
+
+```console
 $ helm 2to3 convert [flags] RELEASE
 ```
 
-### Flags
-
-Plugin flags:
+Flags:
 
 ```
       --dry-run            simulate a convert
@@ -26,24 +49,24 @@ Plugin flags:
       --tiller-out-cluster       when  Tiller is not running in the cluster e.g. Tillerless
 ```
 
-### Install
+## Install
 
 Based on the version in `plugin.yaml`, release binary will be downloaded from GitHub:
 
-```
+```console
 $ helm plugin install https://github.com/hickeyma/helm-2to3
 Downloading and installing helm-2to3 v0.1.0 ...
 https://github.com/hickeyma/helm-2to3/releases/download/v0.1.0/helm-2to3_0.1.0_darwin_amd64.tar.gz
 Installed plugin: 2to3
 ```
 
-### Developer (From Source) Install
+## Developer (From Source) Install
 
 If you would like to handle the build yourself, this is the recommended way to do it.
 
 You must first have [Go](http://golang.org) installed , and then you run:
 
-```
+```console
 $ git clone git@github.com:hickeyma/helm-2to3.git
 $ cd helm-2to3
 $ make
