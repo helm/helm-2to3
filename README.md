@@ -69,7 +69,7 @@ You must first have [Go](http://golang.org) installed , and then you run:
 ```console
 $ git clone git@github.com:hickeyma/helm-2to3.git
 $ cd helm-2to3
-$ make
+$ make build
 $ helm plugin install <your_path>/helm-2to3
 ```
 
