@@ -26,8 +26,8 @@ import (
 func NewRootCmd(out io.Writer, args []string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:          "2to3",
-		Short:        "migrate Helm v2 releases in-place to Helm v3",
-		Long:         "migrate Helm v2 releases in-place to Helm v3",
+		Short:        "migrate Helm v2 repositories and releases in-place to Helm v3",
+		Long:         "migrate Helm v2 repositories and releases in-place to Helm v3",
 		SilenceUsage: true,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
@@ -42,6 +42,7 @@ func NewRootCmd(out io.Writer, args []string) *cobra.Command {
 
 	cmd.AddCommand(
 		newConvertCmd(out),
+		newMoveConfigCmd(out),
 	)
 
 	return cmd
