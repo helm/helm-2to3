@@ -29,6 +29,8 @@ $ export HELM_V3_CONFIG=$PWD/.helm3
 $ helm 2to3 move config
 ```
 
+The `move config` will create the Helm v3 config folder if does not exist, and will override the `repositories.yaml` file if it does exist.
+
 ### Migrate Helm v2 releases
 
 Migrate Helm v2 releases in-place to Helm v3:
