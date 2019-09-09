@@ -86,7 +86,7 @@ func CreateRelease(v2Rel *v2rls.Release) (*release.Release, error) {
 	}, nil
 }
 
-// StoreRelease stores a release objevct in Helm v3 storage
+// StoreRelease stores a release object in Helm v3 storage
 func StoreRelease(rel *release.Release) error {
 	cfg, err := GetActionConfig(rel.Namespace)
 	if err != nil {
@@ -253,7 +253,6 @@ func mapHookEvents(v2HookEvents []v2rls.Hook_Event) ([]release.HookEvent, error)
 		event := release.HookEvent(strings.ToLower(v2EventStr))
 		hookEvents = append(hookEvents, event)
 	}
-	//TODO: hook.LastRun =
 	return hookEvents, nil
 }
 
