@@ -92,7 +92,7 @@ func move() error {
 	v3DataDir := v3DataDir()
 
 	// Create Helm v3 config directory if needed
-	fmt.Printf("i[Helm 3] Create config folder \"%s\" .\n", v3ConfigDir)
+	fmt.Printf("[Helm 3] Create config folder \"%s\" .\n", v3ConfigDir)
 	err := ensureDir(v3ConfigDir)
 	if err != nil {
 		return fmt.Errorf("[Helm 3] Failed to create config folder \"%s\" due to the following error: %s", v3ConfigDir, err)
