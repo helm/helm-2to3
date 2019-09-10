@@ -18,7 +18,13 @@ Flags:
   -h, --help     help for move
 ```
 
-For migration it uses default Helm v2 home and v3 config  and data folders.
+It will migrate:
+- Chart starters
+- Repositories
+- Plugins 
+*Note:* Please check that all Helm v2 plugins work fine with the Helm v3, and remove not working ones.
+
+For migration it uses default Helm v2 home and v3 config and data folders.
 To override those folders you need to set environment variables `HELM_V2_HOME, `HELM_V3_CONFIG` and `HELM_V3_DATA`:
 
 ```console
