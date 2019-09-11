@@ -22,6 +22,7 @@ It will migrate:
 - Chart starters
 - Repositories
 - Plugins 
+
 *Note:* Please check that all Helm v2 plugins work fine with the Helm v3, and remove not working ones.
 
 For migration it uses default Helm v2 home and v3 config and data folders.
@@ -49,11 +50,11 @@ Flags:
 ```
       --dry-run            simulate a convert
   -h, --help               help for convert
-      --keep-v2-releases   v2 releases are retained after migration. By default, the v2 releases are removed
+      --delete-v2-releases   v2 releases are deleted after migration. By default, the v2 releases are retained
   -l, --label string       label to select tiller resources by (default "OWNER=TILLER")
-  -s, --release-storage string   v2 release storage type/object. It can be 'configmaps' or 'secrets'. This is only used with the 'tiller-out-cluster' flag (default "configmaps")
+  -s, --release-storage string   v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag (default "secrets")
   -t, --tiller-ns string   namespace of Tiller (default "kube-system")
-      --tiller-out-cluster       when  Tiller is not running in the cluster e.g. Tillerless
+      --tiller-out-cluster       when Tiller is not running in the cluster e.g. Tillerless
 ```
 
 ## Install
