@@ -62,9 +62,9 @@ Flags:
 Based on the version in `plugin.yaml`, release binary will be downloaded from GitHub:
 
 ```console
-$ helm plugin install https://github.com/hickeyma/helm-2to3
-Downloading and installing helm-2to3 v0.1.0 ...
-https://github.com/hickeyma/helm-2to3/releases/download/v0.1.0/helm-2to3_0.1.0_darwin_amd64.tar.gz
+$ helm plugin install https://github.com/helm/helm-2to3
+Downloading and installing helm-2to3 v0.1.1 ...
+https://github.com/helm/helm-2to3/releases/download/v0.1.1/helm-2to3_0.1.1_darwin_amd64.tar.gz
 Installed plugin: 2to3
 ```
 
@@ -75,7 +75,7 @@ If you would like to handle the build yourself, this is the recommended way to d
 You must first have [Go v1.13](http://golang.org) installed, and then you run:
 
 ```console
-$ git clone git@github.com:hickeyma/helm-2to3.git
+$ git clone git@github.com:helm/helm-2to3.git
 $ cd helm-2to3
 $ make build
 $ helm plugin install <your_path>/helm-2to3
