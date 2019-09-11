@@ -25,6 +25,7 @@ import (
 
 	"helm-2to3/pkg/v2"
 	"helm-2to3/pkg/v3"
+
 	v2rel "k8s.io/helm/pkg/proto/hapi/release"
 )
 
@@ -33,7 +34,7 @@ var (
 	label            string
 	releaseStorage   string
 	dryRun           bool
-	keepv2Releases   bool
+	deletev2Releases bool
 	tillerOutCluster bool
 )
 
@@ -55,9 +56,9 @@ func newConvertCmd(out io.Writer) *cobra.Command {
 	flags.StringVarP(&tillerNamespace, "tiller-ns", "t", "kube-system", "namespace of Tiller")
 	flags.StringVarP(&label, "label", "l", "OWNER=TILLER", "label to select tiller resources by")
 	flags.BoolVar(&dryRun, "dry-run", false, "simulate a convert")
-	flags.BoolVar(&keepv2Releases, "keep-v2-releases", false, "v2 releases are retained after migration. By default, the v2 releases are removed")
+	flags.BoolVar(&deletev2Releases, "delete-v2-releases", false, "v2 releases are deleted after migration. By default, the v2 releases are retained")
 	flags.BoolVar(&tillerOutCluster, "tiller-out-cluster", false, "when  Tiller is not running in the cluster e.g. Tillerless")
-	flags.StringVarP(&releaseStorage, "release-storage", "s", "configmaps", "v2 release storage type/object. It can be 'configmaps' or 'secrets'. This is only used with the 'tiller-out-cluster' flag")
+	flags.StringVarP(&releaseStorage, "release-storage", "s", "secrets", "v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag")
 
 	return cmd
 
@@ -71,10 +72,10 @@ func run(cmd *cobra.Command, args []string) error {
 	return Convert(releaseName)
 }
 
-// Convert converts helm 2 release into Helm 3 release. It maps the Helm v2 release versions
-// of the release into Helm v3 equivalent and stores the release versions. The underlying  Kubernetes resources
+// Convert converts Helm 2 release into Helm 3 release. It maps the Helm v2 release versions
+// of the release into Helm v3 equivalent and stores the release versions. The underlying Kubernetes resources
 // are untouched. Note: The namespaces of each release version need to exist in the Kubernetes  cluster.
-// The Helm 2 release is deleted by default, unless the '--keepv2Releases' flag is set.
+// The Helm 2 release is retained by default, unless the '--deletev2Releases' flag is set.
 func Convert(releaseName string) error {
 	if dryRun {
 		fmt.Printf("NOTE: This is in dry-run mode, the following actions will not be executed.\n")
@@ -114,7 +115,7 @@ func Convert(releaseName string) error {
 		fmt.Printf("[Helm 3] Release \"%s\" created.\n", releaseName)
 	}
 
-	if !keepv2Releases {
+	if deletev2Releases {
 		fmt.Printf("[Helm 2] Release \"%s\" will be deleted.\n", releaseName)
 		deleteOptions := v2.DeleteOptions{
 			DryRun:   dryRun,
