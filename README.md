@@ -1,6 +1,13 @@
 # Helm 2to3 Plugin
 
-This is a Helm plugin which migrates Helm v2 configuration and releases in-place to Helm v3
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Go Report Card](https://goreportcard.com/badge/github.com/helm/helm-2to3)](https://goreportcard.com/report/github.com/helm/helm-2to3)
+[![CircleCI](https://circleci.com/gh/helm/helm-2to3/tree/master.svg?style=svg)](https://circleci.com/gh/helm/helm-2to3/tree/master)
+[![Release](https://img.shields.io/github/release/helm/helm-2to3.svg?style=flat-square)](https://github.com/helm/helm-2to3/releases/latest)
+
+![diagram](./helm-2to3.png)
+
+**Helm plugin which migrates Helm v2 configuration and releases in-place to Helm v3**
 
 ## Usage
 
@@ -26,7 +33,7 @@ It will migrate:
 *Note:* Please check that all Helm v2 plugins work fine with the Helm v3, and remove not working ones.
 
 For migration it uses default Helm v2 home and v3 config and data folders.
-To override those folders you need to set environment variables `HELM_V2_HOME, `HELM_V3_CONFIG` and `HELM_V3_DATA`:
+To override those folders you need to set environment variables `HELM_V2_HOME`, `HELM_V3_CONFIG` and `HELM_V3_DATA`:
 
 ```console
 $ export HELM_V2_HOME=$PWD/.helm2
