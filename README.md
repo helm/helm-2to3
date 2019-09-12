@@ -5,6 +5,8 @@
 [![CircleCI](https://circleci.com/gh/helm/helm-2to3/tree/master.svg?style=svg)](https://circleci.com/gh/helm/helm-2to3/tree/master)
 [![Release](https://img.shields.io/github/release/helm/helm-2to3.svg?style=flat-square)](https://github.com/helm/helm-2to3/releases/latest)
 
+![diagram](./helm-2to3.png)
+
 **Helm plugin which migrates Helm v2 configuration and releases in-place to Helm v3**
 
 The blog [post](https://helm.sh/blog/migrate-from-helm-v2-to-helm-v3/) with detailed examples how to use it.
