@@ -55,12 +55,12 @@ $ helm 2to3 convert [flags] RELEASE
 Flags:
 
 ```
-      --dry-run            simulate a convert
-  -h, --help               help for convert
-      --delete-v2-releases   v2 releases are deleted after migration. By default, the v2 releases are retained
-  -l, --label string       label to select tiller resources by (default "OWNER=TILLER")
+      --dry-run                  simulate a convert
+  -h, --help                     help for convert
+      --delete-v2-releases       v2 releases are deleted after migration. By default, the v2 releases are retained
+  -l, --label string             label to select tiller resources by (default "OWNER=TILLER")
   -s, --release-storage string   v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag (default "secrets")
-  -t, --tiller-ns string   namespace of Tiller (default "kube-system")
+  -t, --tiller-ns string         namespace of Tiller (default "kube-system")
       --tiller-out-cluster       when Tiller is not running in the cluster e.g. Tillerless
 ```
 
@@ -69,12 +69,12 @@ Flags:
 Clean up Helm v2 configuration, release data and Tiller deployment:
 
 ```console
-$ helm  2to3 cleanup [flags]
+$ helm 2to3 cleanup [flags]
 
 Flags:
       --dry-run                  simulate a command
   -h, --help                     help for cleanup
-  -l, --label string       label to select tiller resources by (default "OWNER=TILLER")
+  -l, --label string             label to select tiller resources by (default "OWNER=TILLER")
   -s, --release-storage string   v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag (default "secrets")
   -t, --tiller-ns string         namespace of Tiller (default "kube-system")
       --tiller-out-cluster       when  Tiller is not running in the cluster e.g. Tillerless
@@ -85,17 +85,15 @@ It will clean:
 - v2 release data
 - Tiller deployment
 
-For cleanup it uses default Helm v2 home and v3 config and data folders.
-To override those folders you need to set environment variables `HELM_V2_HOME`, `HELM_V3_CONFIG` and `HELM_V3_DATA`:
+For cleanup it uses the default Helm v2 home folder.
+To override this folder you need to set the environment variable `HELM_V2_HOME`:
 
 ```console
 $ export HELM_V2_HOME=$PWD/.helm2
-$ export HELM_V3_CONFIG=$PWD/.helm3
-$ export HELM_V3_DATA=$PWD/.helm3
-$ helm 2to3 move config
+$ helm 2to3 cleanup
 ```
 
-*Warning:* The `cleanup` command will remove the Helm v2 Configuration, Release Data and Tiller Deployment will be removed.
+*Warning:* The `cleanup` command will remove the Helm v2 Configuration, Release Data and Tiller Deployment.
 It cleans up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.
 Helm v2 will not be usable afterwards.
 
