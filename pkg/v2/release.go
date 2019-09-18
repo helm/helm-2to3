@@ -38,21 +38,23 @@ type DeleteOptions struct {
 	Versions []int32
 }
 
-// GetReleaseVersions returns all release versions from Helm v2 storage for a specified release
+// GetReleaseVersions returns all release versions from Helm v2 storage for a specified release..
+// It is based on Tiller namespace and labels like owner of storage.
 func GetReleaseVersions(retOpts RetrieveOptions) ([]*rls.Release, error) {
 	releases, err := getReleases(retOpts)
 	if err != nil {
 		return nil, err
 	}
 	if len(releases) <= 0 {
-		return nil, fmt.Errorf("%s has no deployed releases", retOpts.ReleaseName)
+		return nil, fmt.Errorf("%s has no deployed releases\n", retOpts.ReleaseName)
 	}
 
 	return releases, nil
 
 }
 
-// DeleteReleaseVersions deletes all release data from Helm v2 storage for a specified release
+// DeleteReleaseVersions deletes all release data from Helm v2 storage for a specified release.
+// It is based on Tiller namespace and labels like owner of storage.
 func DeleteReleaseVersions(retOpts RetrieveOptions, delOpts DeleteOptions) error {
 	for _, ver := range delOpts.Versions {
 		relVerName := fmt.Sprintf("%s.v%d", retOpts.ReleaseName, ver)
@@ -65,6 +67,44 @@ func DeleteReleaseVersions(retOpts RetrieveOptions, delOpts DeleteOptions) error
 		}
 	}
 
+	return nil
+}
+
+// DeleteReleaseVersions deletes all release data from Helm v2 storage.
+// It is based on Tiller namespace and labels like owner of storage.
+func DeleteAllReleaseVersions(retOpts RetrieveOptions, dryRun bool) error {
+	if retOpts.TillerNamespace == "" {
+		retOpts.TillerNamespace = "kube-system"
+	}
+	if retOpts.TillerLabel == "" {
+		retOpts.TillerLabel = "OWNER=TILLER"
+	}
+	if retOpts.StorageType == "" {
+		retOpts.StorageType = "configmaps"
+	}
+
+	// Get all release versions stored for that namespace and owner
+	releases, err := getReleases(retOpts)
+	if err != nil {
+		return err
+	}
+	if len(releases) <= 0 {
+		fmt.Printf("[Helm 2] no deployed releases for namespace: %s, owner: %s\n", retOpts.TillerNamespace, retOpts.TillerLabel)
+		return nil
+	}
+
+	// Delete each release version from storage
+	for i := len(releases) - 1; i >= 0; i-- {
+		release := releases[i]
+		relVerName := GetReleaseVersionName(release.Name, release.Version)
+		fmt.Printf("[Helm 2] ReleaseVersion \"%s\" will be deleted.\n", relVerName)
+		if !dryRun {
+			if err := deleteRelease(retOpts, relVerName); err != nil {
+				return fmt.Errorf("[Helm 2] ReleaseVersion \"%s\" failed to delete with error: %s.\n", relVerName, err)
+			}
+			fmt.Printf("[Helm 2] ReleaseVersion \"%s\" deleted.\n", relVerName)
+		}
+	}
 	return nil
 }
 
@@ -81,13 +121,8 @@ func getReleases(retOpts RetrieveOptions) ([]*rls.Release, error) {
 	if retOpts.StorageType == "" {
 		retOpts.StorageType = "configmaps"
 	}
+	storage := getStorageType(retOpts)
 	clientSet := utils.GetClientSet()
-	var storage string
-	if !retOpts.TillerOutCluster {
-		storage = utils.GetTillerStorage(retOpts.TillerNamespace)
-	} else {
-		storage = retOpts.StorageType
-	}
 	var releases []*rls.Release
 	switch storage {
 	case "secrets":
@@ -127,6 +162,16 @@ func getReleases(retOpts RetrieveOptions) ([]*rls.Release, error) {
 	return releases, nil
 }
 
+func getStorageType(retOpts RetrieveOptions) string {
+	var storage string
+	if !retOpts.TillerOutCluster {
+		storage = utils.GetTillerStorage(retOpts.TillerNamespace)
+	} else {
+		storage = retOpts.StorageType
+	}
+	return storage
+}
+
 func getRelease(itemReleaseData string) *rls.Release {
 	data, _ := utils.DecodeRelease(itemReleaseData)
 	return data
@@ -139,13 +184,8 @@ func deleteRelease(retOpts RetrieveOptions, releaseVersionName string) error {
 	if retOpts.StorageType == "" {
 		retOpts.StorageType = "configmaps"
 	}
+	storage := getStorageType(retOpts)
 	clientSet := utils.GetClientSet()
-	var storage string
-	if !retOpts.TillerOutCluster {
-		storage = utils.GetTillerStorage(retOpts.TillerNamespace)
-	} else {
-		storage = retOpts.StorageType
-	}
 	switch storage {
 	case "secrets":
 		return clientSet.CoreV1().Secrets(retOpts.TillerNamespace).Delete(releaseVersionName, &metav1.DeleteOptions{})

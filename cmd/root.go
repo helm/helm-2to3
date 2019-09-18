@@ -23,11 +23,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	settings *EnvSettings
+)
+
 func NewRootCmd(out io.Writer, args []string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:          "2to3",
-		Short:        "Migrate Helm v2 configuration and releases in-place to Helm v3",
-		Long:         "Migrate Helm v2 configuration and releases in-place to Helm v3",
+		Short:        "Migrate and Cleanup Helm v2 configuration and releases in-place to Helm v3",
+		Long:         "Migrate and Cleanup Helm v2 configuration and releases in-place to Helm v3",
 		SilenceUsage: true,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
@@ -39,8 +43,10 @@ func NewRootCmd(out io.Writer, args []string) *cobra.Command {
 
 	flags := cmd.PersistentFlags()
 	flags.Parse(args)
+	settings = new(EnvSettings)
 
 	cmd.AddCommand(
+		newCleanupCmd(out),
 		newConvertCmd(out),
 		newMoveConfigCmd(out),
 	)
