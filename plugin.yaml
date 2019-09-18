@@ -1,7 +1,7 @@
 name: "2to3"
 version: "0.1.2"
-usage: "migrate Helm v2 configuration and releases in-place to Helm v3"
-description: "migrate Helm v2 configuration and releases in-place to Helm v3"
+usage: "migrate and cleanup Helm v2 configuration and releases in-place to Helm v3"
+description: "migrate and cleanup Helm v2 configuration and releases in-place to Helm v3"
 command: "$HELM_PLUGIN_DIR/bin/2to3"
 hooks:
   install: "cd $HELM_PLUGIN_DIR; scripts/install_plugin.sh"
