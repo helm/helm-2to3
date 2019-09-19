@@ -17,15 +17,12 @@ limitations under the License.
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"io"
-	"os"
-	"strings"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
+	"helm-2to3/pkg/common"
 	"helm-2to3/pkg/v2"
 )
 
@@ -66,7 +63,7 @@ func Cleanup() error {
 	fmt.Printf("This will clean up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.\n")
 	fmt.Printf("Helm v2 will not be usable afterwards.\n\n")
 
-	doCleanup, err := askConfirmation()
+	doCleanup, err := common.AskConfirmation("Cleanup", "cleanup Helm v2 data")
 	if err != nil {
 		return err
 	}
@@ -112,19 +109,4 @@ func Cleanup() error {
 		fmt.Printf("Helm v2 data was cleaned up successfully.\n")
 	}
 	return nil
-}
-
-func askConfirmation() (bool, error) {
-	fmt.Printf("[Cleanup/confirm] Are you sure you want to cleanup Helm v2 data? [y/N]: ")
-
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	if err := scanner.Err(); err != nil {
-		return false, errors.Wrap(err, "couldn't read from standard input")
-	}
-	answer := scanner.Text()
-	if strings.ToLower(answer) == "y" || strings.ToLower(answer) == "yes" {
-		return true, nil
-	}
-	return false, nil
 }
