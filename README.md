@@ -9,6 +9,36 @@
 
 **Helm plugin which migrates and cleans up Helm v2 configuration and releases in-place to Helm v3**
 
+## Overview
+
+One of the most important aspects of upgrading to a new major release of Helm is the
+migration of data. This is especially true of Helm v2 to v3 considering the architectural
+changes between the releases. The 2to3 plugin helps with this migration by supporting:
+- Migration of Helm v2 configuration.
+- Migration of Helm v2 releases.
+- Clean up Helm v2 configuration, release data and Tiller deployment.
+
+## Readme before migration
+
+***WARNING:*** All data migrations carry a level of risk. Helm v2 migration is no different.
+You should be aware of any risks specific to your environment and prepare a data migration
+strategy for your needs.
+
+Here are some suggestions to mitigate against potential risks during migration:
+- Perform a data backup of the following:
+  - Helm v2 home folder.
+  - Release data from the cluster. Refer to [How Helm Uses ConfigMaps to Store Data](http://technosophos.com/2017/03/23/how-helm-uses-configmaps-to-store-data.html)
+  for details on how Helm v2 store release data in the cluster. This should apply
+  similarly if Helm v2 is configured for secrets.
+- Avoid performing operations with Helm v3 until data migration is complete and you are
+  satisfied that it is working as expected. Otherwise, Helm v3 data might be overwritten.
+  The operations to avoid are chart install, adding repositories, plugin install etc.
+- The recommended data migration path is as follows:
+  1. Backup v2 data.
+  2. Migrate Helm v2 configuration.
+  3. Migrate Helm v2 releases.
+  4. When happy that Helm v3 is managing Helm v2 data as expected, then clean up Helm v2 data.
+
 ## Usage
 
 ### Migrate Helm v2 configuration
