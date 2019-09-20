@@ -52,6 +52,7 @@ $ helm 2to3 move config [flags]
 Flags:
 
 ```
+      --dry-run  simulate a command
   -h, --help     help for move
 ```
 
@@ -85,7 +86,7 @@ $ helm 2to3 convert [flags] RELEASE
 Flags:
 
 ```
-      --dry-run                  simulate a convert
+      --dry-run                  simulate a command
   -h, --help                     help for convert
       --delete-v2-releases       v2 releases are deleted after migration. By default, the v2 releases are retained
   -l, --label string             label to select tiller resources by (default "OWNER=TILLER")

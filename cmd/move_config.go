@@ -18,6 +18,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/spf13/cobra"
@@ -38,6 +39,9 @@ func newMoveConfigCmd(out io.Writer) *cobra.Command {
 		RunE: runMove,
 	}
 
+	flags := cmd.Flags()
+	settings.AddBaseFlags(flags)
+
 	return cmd
 }
 
@@ -48,11 +52,33 @@ func runMove(cmd *cobra.Command, args []string) error {
 		return errors.New("config argument has to be specified")
 	}
 
-	return Move()
+	return Move(settings.dryRun)
 }
 
-// Move copies v2 configuration to v2 configuration. It copies repository config,
+// Moves/copies v2 configuration to v2 configuration. It copies repository config,
 // plugins and starters. It does not copy cache.
-func Move() error {
-	return common.Copyv2HomeTov3()
+func Move(dryRun bool) error {
+	if dryRun {
+		fmt.Printf("NOTE: This is in dry-run mode, the following actions will not be executed.\n")
+		fmt.Printf("Run without --dry-run to take the actions described below:\n\n")
+	}
+
+	fmt.Printf("WARNING: Helm v3 configuration maybe overwritten during this operation.\n\n")
+	doCleanup, err := common.AskConfirmation("Move Config", "move the v2 configration")
+	if err != nil {
+		return err
+	}
+	if !doCleanup {
+		return fmt.Errorf("Move configuration will not proceed as the user didn't answer (Y|y) in order to continue")
+	}
+
+	fmt.Printf("\nHelm v2 configuration will be moved to Helm v3 configration.\n")
+	err = common.Copyv2HomeTov3(dryRun)
+	if err != nil {
+		return err
+	}
+	if !dryRun {
+		fmt.Printf("Helm v2 configuration was moved successfully to Helm v3 configration.\n")
+	}
+	return nil
 }
