@@ -68,7 +68,8 @@ func Cleanup() error {
 		return err
 	}
 	if !doCleanup {
-		return fmt.Errorf("Cleanup will not proceed as the user didn't answer (Y|y) in order to continue")
+		fmt.Printf("Cleanup will not proceed as the user didn't answer (Y|y) in order to continue.\n")
+		return nil
 	}
 
 	fmt.Printf("\nHelm v2 data will be cleaned up.\n")

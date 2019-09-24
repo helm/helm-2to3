@@ -69,7 +69,8 @@ func Move(dryRun bool) error {
 		return err
 	}
 	if !doCleanup {
-		return fmt.Errorf("Move configuration will not proceed as the user didn't answer (Y|y) in order to continue")
+		fmt.Printf("Move configuration will not proceed as the user didn't answer (Y|y) in order to continue.\n")
+		return nil
 	}
 
 	fmt.Printf("\nHelm v2 configuration will be moved to Helm v3 configration.\n")
