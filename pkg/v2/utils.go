@@ -45,11 +45,19 @@ func RemoveTiller(tillerNamespace string, dryRun bool) error {
 		tillerNamespace = "kube-system"
 	}
 	if !dryRun {
-		applyCmd := []string{"kubectl", "delete", "--namespace", tillerNamespace, "deploy/tiller-deploy"}
-		output := utils.Execute(applyCmd)
-		if !strings.Contains(string(output), "\"tiller-deploy\" deleted") {
-			return fmt.Errorf("[Helm 2] Failed to remove Tiller service in \"%s\" namespace  due to the following error: %s", tillerNamespace, string(output))
+		fmt.Printf("[Helm 2] Tiller \"%s\" in \"%s\" namespace will be removed.\n", "deploy", tillerNamespace)
+		err := executeKubsDeleteTillerCmd(tillerNamespace, "deploy")
+		if err != nil {
+			return err
 		}
+		fmt.Printf("[Helm 2] Tiller \"%s\" in \"%s\" namespace was removed successfully.\n", "deploy", tillerNamespace)
+
+		fmt.Printf("[Helm 2] Tiller \"%s\" in \"%s\" namespace will be removed.\n", "service", tillerNamespace)
+		err = executeKubsDeleteTillerCmd(tillerNamespace, "service")
+		if err != nil {
+			return err
+		}
+		fmt.Printf("[Helm 2] Tiller \"%s\" in \"%s\" namespace was removed successfully.\n", "service", tillerNamespace)
 	}
 	return nil
 }
@@ -67,5 +75,15 @@ func HomeDir() string {
 
 // GetReleaseVersionName returns release version name
 func GetReleaseVersionName(releaseName string, releaseVersion int32) string {
-        return fmt.Sprintf("%s.v%d", releaseName, releaseVersion)
+	return fmt.Sprintf("%s.v%d", releaseName, releaseVersion)
+}
+
+func executeKubsDeleteTillerCmd(tillerNamespace, label string) error {
+	delLabel := label + "/tiller-deploy"
+	applyCmd := []string{"kubectl", "delete", "--namespace", tillerNamespace, delLabel}
+	output := utils.Execute(applyCmd)
+	if !strings.Contains(string(output), "\"tiller-deploy\" deleted") {
+		return fmt.Errorf("[Helm 2] Failed to remove Tiller \"%s\" in \"%s\" namespace due to the following error: %s", label, tillerNamespace, string(output))
+	}
+	return nil
 }
