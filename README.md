@@ -13,7 +13,7 @@
 
 One of the most important aspects of upgrading to a new major release of Helm is the
 migration of data. This is especially true of Helm v2 to v3 considering the architectural
-changes between the releases. The 2to3 plugin helps with this migration by supporting:
+changes between the releases. The `2to3` plugin helps with this migration by supporting:
 - Migration of Helm v2 configuration.
 - Migration of Helm v2 releases.
 - Clean up Helm v2 configuration, release data and Tiller deployment.
@@ -41,8 +41,9 @@ Here are some suggestions to mitigate against potential risks during migration:
 
 *Note:*
 A Helm v2 client: 
-- can manage 1 to many Kubernetes clusters
-- can connect to 1 to many Tiller instances for  a cluster 
+- can manage 1 to many Kubernetes clusters.
+- can connect to 1 to many Tiller instances for  a cluster.
+ 
 This means that you have to cognisant of this when migrating as releases are deployed into clusters by Tiller and
 its namespace. You have to therefore be aware of migrating for each cluster and each Tiller instance that is managed
 by the Helm v2 client instance. Cleanup should only be run once all migration for a Helm v2 client is complete.
@@ -139,7 +140,7 @@ $ helm 2to3 cleanup
 
 *Warning:* The `cleanup` command will remove the Helm v2 Configuration, Release Data and Tiller Deployment.
 It cleans up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.
-Helm v2 will not be usable afterwards. Cleanup should only be run once all migration (clusters and Tiller instances) for a Helm v2 client is complete.
+Helm v2 will not be usable afterwards. Cleanup should only be run once all migration (clusters and Tiller instances) for a Helm v2 client instance is complete.
 
 ## Install
 

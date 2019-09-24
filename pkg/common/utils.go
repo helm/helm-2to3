@@ -187,7 +187,7 @@ func copySymLink(fileInfo os.FileInfo, srcDirName, destDirName string) error {
 	}
 	newSymLinkName := destDirName + "/" + fileInfo.Name()
 	err = os.Symlink(originFileName, newSymLinkName)
-	if err != nil {
+	if err != nil && !os.IsExist(err) {
 		return err
 	}
 	return nil
