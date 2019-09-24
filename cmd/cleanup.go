@@ -91,13 +91,13 @@ func Cleanup() error {
 	}
 
 	if !settings.tillerOutCluster {
-		fmt.Printf("[Helm 2] Tiller service in \"%s\" namespace will be removed.\n", settings.tillerNamespace)
+		fmt.Printf("[Helm 2] Tiller in \"%s\" namespace will be removed.\n", settings.tillerNamespace)
 		err = v2.RemoveTiller(settings.tillerNamespace, settings.dryRun)
 		if err != nil {
 			return err
 		}
 		if !settings.dryRun {
-			fmt.Printf("[Helm 2] Tiller service in \"%s\" namespace removed.\n", settings.tillerNamespace)
+			fmt.Printf("[Helm 2] Tiller in \"%s\" namespace was removed.\n", settings.tillerNamespace)
 		}
 	}
 
