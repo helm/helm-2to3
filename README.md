@@ -7,7 +7,7 @@
 
 ![diagram](./helm-2to3.png)
 
-**Helm plugin which migrates and cleans up Helm v2 configuration and releases in-place to Helm v3**
+**Helm v3 plugin which migrates and cleans up Helm v2 configuration and releases in-place to Helm v3**
 
 ## Overview
 
