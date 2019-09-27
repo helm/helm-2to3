@@ -53,6 +53,17 @@ by the Helm v2 client instance. Cleanup should only be run once all migration fo
 - Helm v2 client installed on a system which manages releases on one to many clusters
 - Helm v3 client with `2to3` plugin installed on the same system
 
+## Install
+
+Based on the version in `plugin.yaml`, release binary will be downloaded from GitHub:
+
+```console
+$ helm plugin install https://github.com/helm/helm-2to3
+Downloading and installing helm-2to3 v0.1.3 ...
+https://github.com/helm/helm-2to3/releases/download/v0.1.3/helm-2to3_0.1.3_darwin_amd64.tar.gz
+Installed plugin: 2to3
+```
+
 ## Usage
 
 ### Migrate Helm v2 configuration
@@ -141,17 +152,6 @@ $ helm 2to3 cleanup
 *Warning:* The `cleanup` command will remove the Helm v2 Configuration, Release Data and Tiller Deployment.
 It cleans up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.
 Helm v2 will not be usable afterwards. Cleanup should only be run once all migration (clusters and Tiller instances) for a Helm v2 client instance is complete.
-
-## Install
-
-Based on the version in `plugin.yaml`, release binary will be downloaded from GitHub:
-
-```console
-$ helm plugin install https://github.com/helm/helm-2to3
-Downloading and installing helm-2to3 v0.1.1 ...
-https://github.com/helm/helm-2to3/releases/download/v0.1.1/helm-2to3_0.1.1_darwin_amd64.tar.gz
-Installed plugin: 2to3
-```
 
 ## Developer (From Source) Install
 
