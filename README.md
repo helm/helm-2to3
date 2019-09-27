@@ -51,7 +51,7 @@ by the Helm v2 client instance. Cleanup should only be run once all migration fo
 ## Prerequisite
 
 - Helm v2 client installed on a system which manages releases on one to many clusters
-- Helm v3 client installed on the same system
+- Helm v3 client with `2to3` plugin installed on the same system
 
 ## Usage
 
