@@ -123,7 +123,7 @@ func Convert(releaseName string) error {
 		}
 	} else {
 		if !settings.dryRun {
-			fmt.Printf("Release \"%s\" was converted successfully from Helm 2 to Helm 3. Note: the v2 releases still remain and should be removed to avoid conflicts with the migrated v3 releases.\n", releaseName)
+			fmt.Printf("Release \"%s\" was converted successfully from Helm 2 to Helm 3. Note: the v2 release information still remains and should be removed to avoid conflicts with the migrated v3 release.\n", releaseName)
 		}
 	}
 
