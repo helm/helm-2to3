@@ -14,9 +14,9 @@
 One of the most important aspects of upgrading to a new major release of Helm is the
 migration of data. This is especially true of Helm v2 to v3 considering the architectural
 changes between the releases. The `2to3` plugin helps with this migration by supporting:
-- Migration of Helm v2 configuration.
-- Migration of Helm v2 releases.
-- Clean up Helm v2 configuration, release data and Tiller deployment.
+- Migration of [Helm v2 configuration](#migrate-helm-v2-configuration).
+- Migration of [Helm v2 releases](#migrate-helm-v2-releases).
+- [Clean up](#clean-up-helm-v2-data) Helm v2 configuration, release data and Tiller deployment.
 
 ## Readme before migration
 
@@ -34,10 +34,12 @@ Here are some suggestions to mitigate against potential risks during migration:
   satisfied that it is working as expected. Otherwise, Helm v3 data might be overwritten.
   The operations to avoid are chart install, adding repositories, plugin install etc.
 - The recommended data migration path is as follows:
-  1. Backup v2 data.
-  2. Migrate Helm v2 configuration.
-  3. Migrate Helm v2 releases.
-  4. When happy that Helm v3 is managing Helm v2 data as expected, then clean up Helm v2 data.
+  1. Backup v2 data, as suggested above.
+  2. Migrate [Helm v2 configuration](#migrate-helm-v2-configuration).
+  3. Migrate [Helm v2 releases](#migrate-helm-v2-releases).
+  4. When happy that Helm v3 is managing Helm v2 data as expected, then [clean up](#clean-up-helm-v2-data) Helm v2 data.
+     *Note:*: Only use the plugin to do clean up. Using `helm`, `kubectl` or other tools could lead to data loss and an indeterminate
+      state for the release(s).  
 
 *Note:*
 A Helm v2 client: 
@@ -46,7 +48,7 @@ A Helm v2 client:
  
 This means that you have to cognisant of this when migrating as releases are deployed into clusters by Tiller and
 its namespace. You have to therefore be aware of migrating for each cluster and each Tiller instance that is managed
-by the Helm v2 client instance. Cleanup should only be run once all migration for a Helm v2 client is complete.
+by the Helm v2 client instance. [Clean up](#clean-up-helm-v2-data) should only be run once all migration for a Helm v2 client is complete.
 
 ## Prerequisite
 
