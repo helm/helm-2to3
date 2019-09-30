@@ -116,7 +116,7 @@ Flags:
       --dry-run                  simulate a command
   -h, --help                     help for convert
       --delete-v2-releases       v2 releases are deleted after migration. By default, the v2 releases are retained
-  -l, --label string             label to select tiller resources by (default "OWNER=TILLER")
+  -l, --label string             label to select Tiller resources by (default "OWNER=TILLER")
   -s, --release-storage string   v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag (default "secrets")
   -t, --tiller-ns string         namespace of Tiller (default "kube-system")
       --tiller-out-cluster       when Tiller is not running in the cluster e.g. Tillerless
@@ -130,10 +130,13 @@ Clean up Helm v2 configuration, release data and Tiller deployment:
 $ helm 2to3 cleanup [flags]
 
 Flags:
+      --config-cleanup           if set, configuration cleanup performed
       --dry-run                  simulate a command
   -h, --help                     help for cleanup
-  -l, --label string             label to select tiller resources by (default "OWNER=TILLER")
+  -l, --label string             label to select Tiller resources by (default "OWNER=TILLER")
+      --release-cleanup          if set, release data cleanup performed
   -s, --release-storage string   v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag (default "secrets")
+      --tiller-cleanup           if set, Tiller cleanup performed
   -t, --tiller-ns string         namespace of Tiller (default "kube-system")
       --tiller-out-cluster       when  Tiller is not running in the cluster e.g. Tillerless
 ```
@@ -142,6 +145,9 @@ It will clean:
 - Configuration (Helm home directory)
 - v2 release data
 - Tiller deployment
+
+Clean up can be done individually also, by setting one or all of the following flags: `--config-cleanup`, `--release-cleanup` and `--tiller-cleanup`. 
+If none of these flag are set, then all cleanup is performed.
 
 For cleanup it uses the default Helm v2 home folder.
 To override this folder you need to set the environment variable `HELM_V2_HOME`:

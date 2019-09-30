@@ -26,9 +26,11 @@ import (
 	"helm-2to3/pkg/v2"
 )
 
-/*var (
-	settings *EnvSettings
-)*/
+var (
+	configCleanup  bool
+	releaseCleanup bool
+	tillerCleanup  bool
+)
 
 func newCleanupCmd(out io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
@@ -43,6 +45,10 @@ func newCleanupCmd(out io.Writer) *cobra.Command {
 	flags := cmd.Flags()
 	settings.AddFlags(flags)
 
+	flags.BoolVar(&configCleanup, "config-cleanup", false, "if set, configuration cleanup performed")
+	flags.BoolVar(&releaseCleanup, "release-cleanup", false, "if set, release data cleanup performed")
+	flags.BoolVar(&tillerCleanup, "tiller-cleanup", false, "if set, Tiller cleanup performed")
+
 	return cmd
 }
 
@@ -54,6 +60,13 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 // the Tiller server deployed as per namespace and owner label. It is also delete the Helm gv2 home directory
 // which contains the Helm configuration. Helm v2 will be unusable after this operation.
 func Cleanup() error {
+	// If no specific cleanup set, then we assume full cleanup to be done
+	if !configCleanup && !releaseCleanup && !tillerCleanup {
+		configCleanup = true
+		releaseCleanup = true
+		tillerCleanup = true
+	}
+
 	if settings.dryRun {
 		fmt.Printf("NOTE: This is in dry-run mode, the following actions will not be executed.\n")
 		fmt.Printf("Run without --dry-run to take the actions described below:\n\n")
@@ -74,23 +87,25 @@ func Cleanup() error {
 
 	fmt.Printf("\nHelm v2 data will be cleaned up.\n")
 
-	fmt.Printf("[Helm 2] Releases will be deleted.\n")
-	retrieveOptions := v2.RetrieveOptions{
-		ReleaseName:      "",
-		TillerNamespace:  settings.tillerNamespace,
-		TillerLabel:      settings.label,
-		TillerOutCluster: settings.tillerOutCluster,
-		StorageType:      settings.releaseStorage,
-	}
-	err = v2.DeleteAllReleaseVersions(retrieveOptions, settings.dryRun)
-	if err != nil {
-		return err
-	}
-	if !settings.dryRun {
-		fmt.Printf("[Helm 2] Releases deleted.\n")
+	if releaseCleanup {
+		fmt.Printf("[Helm 2] Releases will be deleted.\n")
+		retrieveOptions := v2.RetrieveOptions{
+			ReleaseName:      "",
+			TillerNamespace:  settings.tillerNamespace,
+			TillerLabel:      settings.label,
+			TillerOutCluster: settings.tillerOutCluster,
+			StorageType:      settings.releaseStorage,
+		}
+		err = v2.DeleteAllReleaseVersions(retrieveOptions, settings.dryRun)
+		if err != nil {
+			return err
+		}
+		if !settings.dryRun {
+			fmt.Printf("[Helm 2] Releases deleted.\n")
+		}
 	}
 
-	if !settings.tillerOutCluster {
+	if !settings.tillerOutCluster && tillerCleanup {
 		fmt.Printf("[Helm 2] Tiller in \"%s\" namespace will be removed.\n", settings.tillerNamespace)
 		err = v2.RemoveTiller(settings.tillerNamespace, settings.dryRun)
 		if err != nil {
@@ -101,9 +116,11 @@ func Cleanup() error {
 		}
 	}
 
-	err = v2.RemoveHomeFolder(settings.dryRun)
-	if err != nil {
-		return err
+	if configCleanup {
+		err = v2.RemoveHomeFolder(settings.dryRun)
+		if err != nil {
+			return err
+		}
 	}
 
 	if !settings.dryRun {

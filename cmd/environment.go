@@ -42,7 +42,7 @@ func (s *EnvSettings) AddBaseFlags(fs *pflag.FlagSet) {
 func (s *EnvSettings) AddFlags(fs *pflag.FlagSet) {
 	s.AddBaseFlags(fs)
 	fs.StringVarP(&s.tillerNamespace, "tiller-ns", "t", "kube-system", "namespace of Tiller")
-	fs.StringVarP(&s.label, "label", "l", "OWNER=TILLER", "label to select tiller resources by")
+	fs.StringVarP(&s.label, "label", "l", "OWNER=TILLER", "label to select Tiller resources by")
 	fs.BoolVar(&s.tillerOutCluster, "tiller-out-cluster", false, "when  Tiller is not running in the cluster e.g. Tillerless")
 	fs.StringVarP(&s.releaseStorage, "release-storage", "s", "secrets", "v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag")
 }
