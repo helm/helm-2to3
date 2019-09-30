@@ -125,7 +125,7 @@ func Convert(releaseName string) error {
 		if !settings.dryRun {
 			fmt.Printf("Release \"%s\" was converted successfully from Helm v2 to Helm v3.\n", releaseName)
 			fmt.Printf("Note: The v2 release information still remains and should be removed to avoid conflicts with the migrated v3 release.\n")
-			fmt.Printf("v2 release information should only be removed using `helm 2to3 cleanup` and when all releases have been migrated over.\n.\n")
+			fmt.Printf("v2 release information should only be removed using `helm 2to3` cleanup and when all releases have been migrated over.\n")
 		}
 	}
 
