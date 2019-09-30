@@ -74,7 +74,7 @@ func Convert(releaseName string) error {
 		fmt.Printf("Run without --dry-run to take the actions described below:\n\n")
 	}
 
-	fmt.Printf("Release \"%s\" will be converted from Helm 2 to Helm 3.\n", releaseName)
+	fmt.Printf("Release \"%s\" will be converted from Helm v2 to Helm v3.\n", releaseName)
 
 	fmt.Printf("[Helm 3] Release \"%s\" will be created.\n", releaseName)
 
@@ -119,11 +119,13 @@ func Convert(releaseName string) error {
 		if !settings.dryRun {
 			fmt.Printf("[Helm 2] Release \"%s\" deleted.\n", releaseName)
 
-			fmt.Printf("Release \"%s\" was converted successfully from Helm 2 to Helm 3.\n", releaseName)
+			fmt.Printf("Release \"%s\" was converted successfully from Helm v2 to Helm v3.\n", releaseName)
 		}
 	} else {
 		if !settings.dryRun {
-			fmt.Printf("Release \"%s\" was converted successfully from Helm 2 to Helm 3. Note: the v2 release information still remains and should be removed to avoid conflicts with the migrated v3 release.\n", releaseName)
+			fmt.Printf("Release \"%s\" was converted successfully from Helm v2 to Helm v3.\n", releaseName)
+			fmt.Printf("Note: The v2 release information still remains and should be removed to avoid conflicts with the migrated v3 release.\n")
+			fmt.Printf("v2 release information should be only be removed using 'helm 2to3 cleanup' and when all releases have been migrated over.\n")
 		}
 	}
 
