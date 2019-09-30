@@ -33,6 +33,16 @@ var (
 	deletev2Releases bool
 )
 
+type ConvertOptions struct {
+	DeleteRelease    bool
+	DryRun           bool
+	ReleaseName      string
+	StorageType      string
+	TillerLabel      string
+	TillerNamespace  string
+	TillerOutCluster bool
+}
+
 func newConvertCmd(out io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "convert [flags] RELEASE",
@@ -44,7 +54,7 @@ func newConvertCmd(out io.Writer) *cobra.Command {
 			return nil
 		},
 
-		RunE: run,
+		RunE: runConvert,
 	}
 
 	flags := cmd.Flags()
@@ -56,34 +66,43 @@ func newConvertCmd(out io.Writer) *cobra.Command {
 
 }
 
-func run(cmd *cobra.Command, args []string) error {
+func runConvert(cmd *cobra.Command, args []string) error {
 	releaseName := args[0]
 	if settings.releaseStorage != "configmaps" && settings.releaseStorage != "secrets" {
 		return errors.New("release-storage flag needs to be 'configmaps' or 'secrets'")
 	}
-	return Convert(releaseName)
+	convertOptions := ConvertOptions{
+		DeleteRelease:    deletev2Releases,
+		DryRun:           settings.dryRun,
+		ReleaseName:      releaseName,
+		StorageType:      settings.releaseStorage,
+		TillerLabel:      settings.label,
+		TillerNamespace:  settings.tillerNamespace,
+		TillerOutCluster: settings.tillerOutCluster,
+	}
+	return Convert(convertOptions)
 }
 
 // Convert converts Helm 2 release into Helm 3 release. It maps the Helm v2 release versions
 // of the release into Helm v3 equivalent and stores the release versions. The underlying Kubernetes resources
 // are untouched. Note: The namespaces of each release version need to exist in the Kubernetes  cluster.
 // The Helm 2 release is retained by default, unless the '--delete-v2-releases' flag is set.
-func Convert(releaseName string) error {
-	if settings.dryRun {
+func Convert(convertOptions ConvertOptions) error {
+	if convertOptions.DryRun {
 		fmt.Printf("NOTE: This is in dry-run mode, the following actions will not be executed.\n")
 		fmt.Printf("Run without --dry-run to take the actions described below:\n\n")
 	}
 
-	fmt.Printf("Release \"%s\" will be converted from Helm v2 to Helm v3.\n", releaseName)
+	fmt.Printf("Release \"%s\" will be converted from Helm v2 to Helm v3.\n", convertOptions.ReleaseName)
 
-	fmt.Printf("[Helm 3] Release \"%s\" will be created.\n", releaseName)
+	fmt.Printf("[Helm 3] Release \"%s\" will be created.\n", convertOptions.ReleaseName)
 
 	retrieveOptions := v2.RetrieveOptions{
-		ReleaseName:      releaseName,
-		TillerNamespace:  settings.tillerNamespace,
-		TillerLabel:      settings.label,
-		TillerOutCluster: settings.tillerOutCluster,
-		StorageType:      settings.releaseStorage,
+		ReleaseName:      convertOptions.ReleaseName,
+		TillerNamespace:  convertOptions.TillerNamespace,
+		TillerLabel:      convertOptions.TillerLabel,
+		TillerOutCluster: convertOptions.TillerOutCluster,
+		StorageType:      convertOptions.StorageType,
 	}
 	v2Releases, err := v2.GetReleaseVersions(retrieveOptions)
 	if err != nil {
@@ -93,9 +112,9 @@ func Convert(releaseName string) error {
 	versions := []int32{}
 	for i := len(v2Releases) - 1; i >= 0; i-- {
 		v2Release := v2Releases[i]
-		relVerName := v2.GetReleaseVersionName(releaseName, v2Release.Version)
+		relVerName := v2.GetReleaseVersionName(convertOptions.ReleaseName, v2Release.Version)
 		fmt.Printf("[Helm 3] ReleaseVersion \"%s\" will be created.\n", relVerName)
-		if !settings.dryRun {
+		if !convertOptions.DryRun {
 			if err := createV3ReleaseVersion(v2Release); err != nil {
 				return err
 			}
@@ -103,27 +122,27 @@ func Convert(releaseName string) error {
 		}
 		versions = append(versions, v2Release.Version)
 	}
-	if !settings.dryRun {
-		fmt.Printf("[Helm 3] Release \"%s\" created.\n", releaseName)
+	if !convertOptions.DryRun {
+		fmt.Printf("[Helm 3] Release \"%s\" created.\n", convertOptions.ReleaseName)
 	}
 
-	if deletev2Releases {
-		fmt.Printf("[Helm 2] Release \"%s\" will be deleted.\n", releaseName)
+	if convertOptions.DeleteRelease {
+		fmt.Printf("[Helm 2] Release \"%s\" will be deleted.\n", convertOptions.ReleaseName)
 		deleteOptions := v2.DeleteOptions{
-			DryRun:   settings.dryRun,
+			DryRun:   convertOptions.DryRun,
 			Versions: versions,
 		}
 		if err := v2.DeleteReleaseVersions(retrieveOptions, deleteOptions); err != nil {
 			return err
 		}
-		if !settings.dryRun {
-			fmt.Printf("[Helm 2] Release \"%s\" deleted.\n", releaseName)
+		if !convertOptions.DryRun {
+			fmt.Printf("[Helm 2] Release \"%s\" deleted.\n", convertOptions.ReleaseName)
 
-			fmt.Printf("Release \"%s\" was converted successfully from Helm v2 to Helm v3.\n", releaseName)
+			fmt.Printf("Release \"%s\" was converted successfully from Helm v2 to Helm v3.\n", convertOptions.ReleaseName)
 		}
 	} else {
-		if !settings.dryRun {
-			fmt.Printf("Release \"%s\" was converted successfully from Helm v2 to Helm v3.\n", releaseName)
+		if !convertOptions.DryRun {
+			fmt.Printf("Release \"%s\" was converted successfully from Helm v2 to Helm v3.\n", convertOptions.ReleaseName)
 			fmt.Printf("Note: The v2 release information still remains and should be removed to avoid conflicts with the migrated v3 release.\n")
 			fmt.Printf("v2 release information should only be removed using `helm 2to3` cleanup and when all releases have been migrated over.\n")
 		}
