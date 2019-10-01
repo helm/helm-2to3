@@ -88,10 +88,10 @@ It will migrate:
 - Repositories
 - Plugins 
 
-*Note:* Please check that all Helm v2 plugins work fine with the Helm v3, and remove not working ones.
-
-For migration it uses default Helm v2 home and v3 config and data folders.
-To override those folders you need to set environment variables `HELM_V2_HOME`, `HELM_V3_CONFIG` and `HELM_V3_DATA`:
+*Note:*
+- The `move config` command will create the Helm v3 config and data folders if they don't exist, and will override the `repositories.yaml` file if it does exist.
+- For migration it uses default Helm v2 home and v3 config and data folders. To override those folders you need to set environment variables
+`HELM_V2_HOME`, `HELM_V3_CONFIG` and `HELM_V3_DATA`:
 
 ```console
 $ export HELM_V2_HOME=$PWD/.helm2
@@ -100,7 +100,14 @@ $ export HELM_V3_DATA=$PWD/.helm3
 $ helm 2to3 move config
 ```
 
-The `move config` will create the Helm v3 config and data folders if they don't exist, and will override the `repositories.yaml` file if it does exist.
+#### Readme after configuration migration
+
+- After running the command, check that all Helm v2 plugins work fine with the Helm v3. If any issue with a plugin, remove it (`<helm3> plugin remove`) and
+re-add (`<helm3> plugin install`) it as required.
+- The repository file `repositories.yaml` is copied to Helm v3 which contains references to repositories added in Helm v2. Local respoitories are not copied to Helm v3.
+You should remove all local repositories from Helm v3 using `<helm3> repo remove` and re-add where necessary using `<helm3> repo add`. This is a necessary refresh to align references
+for Helm v3.
+- When you are happy with your repository list, update the Helm v3 repo `<helm3> repo update`. This cleans up any Helm v2 cache references from Helm v3.
 
 ### Migrate Helm v2 releases
 
@@ -160,6 +167,26 @@ $ helm 2to3 cleanup
 *Warning:* The `cleanup` command will remove the Helm v2 Configuration, Release Data and Tiller Deployment.
 It cleans up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.
 Helm v2 will not be usable afterwards. Cleanup should only be run once all migration (clusters and Tiller instances) for a Helm v2 client instance is complete.
+
+## Troubleshooting
+
+***Q. I get an error when I try to do a chart dependency update in Helm v3 after configuration migration***
+
+Error might be similar to the following:
+
+```console
+$ helm dep update chrt-1/
+Hang tight while we grab the latest from your chart repositories...
+...Unable to get an update from the "local" chart repository (http://127.0.0.1:8879/charts):
+	Get http://127.0.0.1:8879/charts/index.yaml: dial tcp 127.0.0.1:8879: connect: connection refused
+...Successfully got an update from the "stable" chart repository
+Update Complete. ⎈Happy Helming!⎈
+Error: open /home/usr1/.cache/helm/repository/local-index.yaml: no such file or directory
+``` 
+
+A. Local respoitories are not copied to Helm v3. You therefore need to remove all local repositories from Helm v3 using `<helm3> repo remove` and re-add where 
+required using `<helm3> repo add`. This is a necessary refresh to align references for Helm v3 and remove the conflict. It is worthwhile to also refresh the 
+repository list afterwards: `<helm3> repo update`. You should then be able to run the chart dependency update command successfully.
 
 ## Developer (From Source) Install
 
