@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -28,6 +29,8 @@ import (
 	"helm-2to3/pkg/v2"
 	"helm-2to3/pkg/v3"
 )
+
+const sep = string(filepath.Separator)
 
 // Copyv2HomeTov3 copies the v2 home directory to the v3 home directory .
 // Note that this is not a direct 1-1 copy
@@ -51,8 +54,8 @@ func Copyv2HomeTov3(dryRun bool) error {
 	}
 
 	// Move repo config
-	v2RepoConfig := v2HomeDir + "/repository/repositories.yaml"
-	v3RepoConfig := v3ConfigDir + "/repositories.yaml"
+	v2RepoConfig := v2HomeDir + sep + "repository" + sep + "repositories.yaml"
+	v3RepoConfig := v3ConfigDir + sep + "repositories.yaml"
 	fmt.Printf("[Helm 2] repositories file \"%s\" will copy to [Helm 3] config folder \"%s\" .\n", v2RepoConfig, v3RepoConfig)
 	if !dryRun {
 		err = copyFile(v2RepoConfig, v3RepoConfig)
@@ -62,7 +65,7 @@ func Copyv2HomeTov3(dryRun bool) error {
 		fmt.Printf("[Helm 2] repositories file \"%s\" copied successfully to [Helm 3] config folder \"%s\" .\n", v2RepoConfig, v3RepoConfig)
 	}
 
-	// Bot moving local repo as it is no longer5 supported in v3: v2HomeDir/repository/local
+	// Not moving local repo as it is safer to recreate: e.g. v2HomeDir/repository/local
 
 	// Not moving the cache as it is safer to recreate when needed
 	// v2HomeDir/cache and v2HomeDir/repository/cache
@@ -78,8 +81,8 @@ func Copyv2HomeTov3(dryRun bool) error {
 	}
 
 	// Move plugins
-	v2Plugins := v2HomeDir + "/plugins"
-	v3Plugins := v3DataDir + "/plugins"
+	v2Plugins := v2HomeDir + sep + "plugins"
+	v3Plugins := v3DataDir + sep + "plugins"
 	fmt.Printf("[Helm 2] plugins \"%s\" will copy to [Helm 3] data folder \"%s\" .\n", v2Plugins, v3Plugins)
 	if !dryRun {
 		err = copyDir(v2Plugins, v3Plugins)
@@ -90,8 +93,8 @@ func Copyv2HomeTov3(dryRun bool) error {
 	}
 
 	// Move starters
-	v2Starters := v2HomeDir + "/starters"
-	v3Starters := v3DataDir + "/starters"
+	v2Starters := v2HomeDir + sep + "starters"
+	v3Starters := v3DataDir + sep + "starters"
 	fmt.Printf("[Helm 2] starters \"%s\" will copy to [Helm 3] data folder \"%s\" .\n", v2Starters, v3Starters)
 	if !dryRun {
 		err = copyDir(v2Starters, v3Starters)
@@ -142,8 +145,8 @@ func copyDir(srcDirName, destDirName string) error {
 	directory, _ := os.Open(srcDirName)
 	objects, err := directory.Readdir(-1)
 	for _, obj := range objects {
-		srcFileName := srcDirName + "/" + obj.Name()
-		destFileName := destDirName + "/" + obj.Name()
+		srcFileName := srcDirName + sep + obj.Name()
+		destFileName := destDirName + sep + obj.Name()
 		if obj.IsDir() {
 			// create sub-directories - recursively
 			err = copyDir(srcFileName, destFileName)
@@ -181,11 +184,11 @@ func ensureDir(dirName string) error {
 }
 
 func copySymLink(fileInfo os.FileInfo, srcDirName, destDirName string) error {
-	originFileName, err := os.Readlink(srcDirName + "/" + fileInfo.Name())
+	originFileName, err := os.Readlink(srcDirName + sep + fileInfo.Name())
 	if err != nil {
 		return err
 	}
-	newSymLinkName := destDirName + "/" + fileInfo.Name()
+	newSymLinkName := destDirName + sep + fileInfo.Name()
 	err = os.Symlink(originFileName, newSymLinkName)
 	if err != nil && !os.IsExist(err) {
 		return err

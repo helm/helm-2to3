@@ -19,11 +19,14 @@ package v2
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	utils "github.com/maorfr/helm-plugin-utils/pkg"
 	"github.com/mitchellh/go-homedir"
 )
+
+const sep = string(filepath.Separator)
 
 // RemoveHomeFolder removes the v2 Helm home folder
 func RemoveHomeFolder(dryRun bool) error {
@@ -69,7 +72,7 @@ func HomeDir() string {
 	}
 
 	homeDir, _ := homedir.Dir()
-	defaultDir := homeDir + "/.helm"
+	defaultDir := homeDir + sep + ".helm"
 	return defaultDir
 }
 
