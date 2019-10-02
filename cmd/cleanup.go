@@ -17,8 +17,8 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"io"
+	"log"
 
 	"github.com/spf13/cobra"
 
@@ -88,27 +88,29 @@ func Cleanup(cleanupOptions CleanupOptions) error {
 	}
 
 	if cleanupOptions.DryRun {
-		fmt.Printf("NOTE: This is in dry-run mode, the following actions will not be executed.\n")
-		fmt.Printf("Run without --dry-run to take the actions described below:\n\n")
+		log.Println("NOTE: This is in dry-run mode, the following actions will not be executed.")
+		log.Println("Run without --dry-run to take the actions described below:")
+		log.Println()
 	}
 
-	fmt.Printf("WARNING: Helm v2 Configuration, Release Data and Tiller Deployment will be removed.\n")
-	fmt.Printf("This will clean up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.\n")
-	fmt.Printf("Helm v2 will not be usable afterwards.\n\n")
+	log.Println("WARNING: Helm v2 Configuration, Release Data and Tiller Deployment will be removed.")
+	log.Println("This will clean up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.")
+	log.Println("Helm v2 will not be usable afterwards.")
+	log.Println()
 
 	doCleanup, err := common.AskConfirmation("Cleanup", "cleanup Helm v2 data")
 	if err != nil {
 		return err
 	}
 	if !doCleanup {
-		fmt.Printf("Cleanup will not proceed as the user didn't answer (Y|y) in order to continue.\n")
+		log.Println("Cleanup will not proceed as the user didn't answer (Y|y) in order to continue.")
 		return nil
 	}
 
-	fmt.Printf("\nHelm v2 data will be cleaned up.\n")
+	log.Printf("\nHelm v2 data will be cleaned up.\n")
 
 	if cleanupOptions.ReleaseCleanup {
-		fmt.Printf("[Helm 2] Releases will be deleted.\n")
+		log.Println("[Helm 2] Releases will be deleted.")
 		retrieveOptions := v2.RetrieveOptions{
 			ReleaseName:      "",
 			TillerNamespace:  cleanupOptions.TillerNamespace,
@@ -121,18 +123,18 @@ func Cleanup(cleanupOptions CleanupOptions) error {
 			return err
 		}
 		if !cleanupOptions.DryRun {
-			fmt.Printf("[Helm 2] Releases deleted.\n")
+			log.Println("[Helm 2] Releases deleted.")
 		}
 	}
 
 	if !cleanupOptions.TillerOutCluster && cleanupOptions.TillerCleanup {
-		fmt.Printf("[Helm 2] Tiller in \"%s\" namespace will be removed.\n", cleanupOptions.TillerNamespace)
+		log.Printf("[Helm 2] Tiller in \"%s\" namespace will be removed.\n", cleanupOptions.TillerNamespace)
 		err = v2.RemoveTiller(cleanupOptions.TillerNamespace, cleanupOptions.DryRun)
 		if err != nil {
 			return err
 		}
 		if !cleanupOptions.DryRun {
-			fmt.Printf("[Helm 2] Tiller in \"%s\" namespace was removed.\n", cleanupOptions.TillerNamespace)
+			log.Printf("[Helm 2] Tiller in \"%s\" namespace was removed.\n", cleanupOptions.TillerNamespace)
 		}
 	}
 
@@ -144,7 +146,7 @@ func Cleanup(cleanupOptions CleanupOptions) error {
 	}
 
 	if !cleanupOptions.DryRun {
-		fmt.Printf("Helm v2 data was cleaned up successfully.\n")
+		log.Println("Helm v2 data was cleaned up successfully.")
 	}
 	return nil
 }

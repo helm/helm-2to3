@@ -18,6 +18,7 @@ package v2
 
 import (
 	"fmt"
+	"log"
 
 	utils "github.com/maorfr/helm-plugin-utils/pkg"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -58,12 +59,12 @@ func GetReleaseVersions(retOpts RetrieveOptions) ([]*rls.Release, error) {
 func DeleteReleaseVersions(retOpts RetrieveOptions, delOpts DeleteOptions) error {
 	for _, ver := range delOpts.Versions {
 		relVerName := fmt.Sprintf("%s.v%d", retOpts.ReleaseName, ver)
-		fmt.Printf("[Helm 2] ReleaseVersion \"%s\" will be deleted.\n", relVerName)
+		log.Printf("[Helm 2] ReleaseVersion \"%s\" will be deleted.\n", relVerName)
 		if !delOpts.DryRun {
 			if err := deleteRelease(retOpts, relVerName); err != nil {
 				return fmt.Errorf("[Helm 2] ReleaseVersion \"%s\" failed to delete with error: %s.\n", relVerName, err)
 			}
-			fmt.Printf("[Helm 2] ReleaseVersion \"%s\" deleted.\n", relVerName)
+			log.Printf("[Helm 2] ReleaseVersion \"%s\" deleted.\n", relVerName)
 		}
 	}
 
@@ -89,7 +90,7 @@ func DeleteAllReleaseVersions(retOpts RetrieveOptions, dryRun bool) error {
 		return err
 	}
 	if len(releases) <= 0 {
-		fmt.Printf("[Helm 2] no deployed releases for namespace: %s, owner: %s\n", retOpts.TillerNamespace, retOpts.TillerLabel)
+		log.Printf("[Helm 2] no deployed releases for namespace: %s, owner: %s\n", retOpts.TillerNamespace, retOpts.TillerLabel)
 		return nil
 	}
 
@@ -97,12 +98,12 @@ func DeleteAllReleaseVersions(retOpts RetrieveOptions, dryRun bool) error {
 	for i := len(releases) - 1; i >= 0; i-- {
 		release := releases[i]
 		relVerName := GetReleaseVersionName(release.Name, release.Version)
-		fmt.Printf("[Helm 2] ReleaseVersion \"%s\" will be deleted.\n", relVerName)
+		log.Printf("[Helm 2] ReleaseVersion \"%s\" will be deleted.\n", relVerName)
 		if !dryRun {
 			if err := deleteRelease(retOpts, relVerName); err != nil {
 				return fmt.Errorf("[Helm 2] ReleaseVersion \"%s\" failed to delete with error: %s.\n", relVerName, err)
 			}
-			fmt.Printf("[Helm 2] ReleaseVersion \"%s\" deleted.\n", relVerName)
+			log.Printf("[Helm 2] ReleaseVersion \"%s\" deleted.\n", relVerName)
 		}
 	}
 	return nil
