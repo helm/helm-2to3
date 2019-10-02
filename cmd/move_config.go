@@ -18,8 +18,8 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 	"io"
+	"log"
 
 	"github.com/spf13/cobra"
 
@@ -59,27 +59,29 @@ func runMove(cmd *cobra.Command, args []string) error {
 // plugins and starters. It does not copy cache.
 func Move(dryRun bool) error {
 	if dryRun {
-		fmt.Printf("NOTE: This is in dry-run mode, the following actions will not be executed.\n")
-		fmt.Printf("Run without --dry-run to take the actions described below:\n\n")
+		log.Println("NOTE: This is in dry-run mode, the following actions will not be executed.")
+		log.Println("Run without --dry-run to take the actions described below:")
+		log.Println()
 	}
 
-	fmt.Printf("WARNING: Helm v3 configuration maybe overwritten during this operation.\n\n")
+	log.Println("WARNING: Helm v3 configuration maybe overwritten during this operation.")
+	log.Println()
 	doCleanup, err := common.AskConfirmation("Move Config", "move the v2 configration")
 	if err != nil {
 		return err
 	}
 	if !doCleanup {
-		fmt.Printf("Move configuration will not proceed as the user didn't answer (Y|y) in order to continue.\n")
+		log.Println("Move configuration will not proceed as the user didn't answer (Y|y) in order to continue.")
 		return nil
 	}
 
-	fmt.Printf("\nHelm v2 configuration will be moved to Helm v3 configration.\n")
+	log.Println("\nHelm v2 configuration will be moved to Helm v3 configration.")
 	err = common.Copyv2HomeTov3(dryRun)
 	if err != nil {
 		return err
 	}
 	if !dryRun {
-		fmt.Printf("Helm v2 configuration was moved successfully to Helm v3 configration.\n")
+		log.Println("Helm v2 configuration was moved successfully to Helm v3 configration.")
 	}
 	return nil
 }

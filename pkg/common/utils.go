@@ -20,6 +20,7 @@ import (
 	"bufio"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,33 +37,33 @@ const sep = string(filepath.Separator)
 // Note that this is not a direct 1-1 copy
 func Copyv2HomeTov3(dryRun bool) error {
 	v2HomeDir := v2.HomeDir()
-	fmt.Printf("[Helm 2] Home directory: %s\n", v2HomeDir)
+	log.Printf("[Helm 2] Home directory: %s\n", v2HomeDir)
 	v3ConfigDir := v3.ConfigDir()
-	fmt.Printf("[Helm 3] Config directory: %s\n", v3ConfigDir)
+	log.Printf("[Helm 3] Config directory: %s\n", v3ConfigDir)
 	v3DataDir := v3.DataDir()
-	fmt.Printf("[Helm 3] Data directory: %s\n", v3DataDir)
+	log.Printf("[Helm 3] Data directory: %s\n", v3DataDir)
 
 	// Create Helm v3 config directory if needed
-	fmt.Printf("[Helm 3] Create config folder \"%s\" .\n", v3ConfigDir)
+	log.Printf("[Helm 3] Create config folder \"%s\" .\n", v3ConfigDir)
 	var err error
 	if !dryRun {
 		err = ensureDir(v3ConfigDir)
 		if err != nil {
 			return fmt.Errorf("[Helm 3] Failed to create config folder \"%s\" due to the following error: %s", v3ConfigDir, err)
 		}
-		fmt.Printf("[Helm 3] Config folder \"%s\" created.\n", v3ConfigDir)
+		log.Printf("[Helm 3] Config folder \"%s\" created.\n", v3ConfigDir)
 	}
 
 	// Move repo config
 	v2RepoConfig := v2HomeDir + sep + "repository" + sep + "repositories.yaml"
 	v3RepoConfig := v3ConfigDir + sep + "repositories.yaml"
-	fmt.Printf("[Helm 2] repositories file \"%s\" will copy to [Helm 3] config folder \"%s\" .\n", v2RepoConfig, v3RepoConfig)
+	log.Printf("[Helm 2] repositories file \"%s\" will copy to [Helm 3] config folder \"%s\" .\n", v2RepoConfig, v3RepoConfig)
 	if !dryRun {
 		err = copyFile(v2RepoConfig, v3RepoConfig)
 		if err != nil {
 			return fmt.Errorf("Failed to copy [Helm 2] repository file \"%s\" due to the following error: %s", v2RepoConfig, err)
 		}
-		fmt.Printf("[Helm 2] repositories file \"%s\" copied successfully to [Helm 3] config folder \"%s\" .\n", v2RepoConfig, v3RepoConfig)
+		log.Printf("[Helm 2] repositories file \"%s\" copied successfully to [Helm 3] config folder \"%s\" .\n", v2RepoConfig, v3RepoConfig)
 	}
 
 	// Not moving local repo as it is safer to recreate: e.g. v2HomeDir/repository/local
@@ -71,37 +72,37 @@ func Copyv2HomeTov3(dryRun bool) error {
 	// v2HomeDir/cache and v2HomeDir/repository/cache
 
 	// Create Helm v3 data directory if needed
-	fmt.Printf("[Helm 3] Create data folder \"%s\" .\n", v3DataDir)
+	log.Printf("[Helm 3] Create data folder \"%s\" .\n", v3DataDir)
 	if !dryRun {
 		err = ensureDir(v3DataDir)
 		if err != nil {
 			return fmt.Errorf("[Helm 3] Failed to create data folder \"%s\" due to the following error: %s", v3DataDir, err)
 		}
-		fmt.Printf("[Helm 3] data folder \"%s\" created.\n", v3DataDir)
+		log.Printf("[Helm 3] data folder \"%s\" created.\n", v3DataDir)
 	}
 
 	// Move plugins
 	v2Plugins := v2HomeDir + sep + "plugins"
 	v3Plugins := v3DataDir + sep + "plugins"
-	fmt.Printf("[Helm 2] plugins \"%s\" will copy to [Helm 3] data folder \"%s\" .\n", v2Plugins, v3Plugins)
+	log.Printf("[Helm 2] plugins \"%s\" will copy to [Helm 3] data folder \"%s\" .\n", v2Plugins, v3Plugins)
 	if !dryRun {
 		err = copyDir(v2Plugins, v3Plugins)
 		if err != nil {
 			return fmt.Errorf("Failed to copy [Helm 2] plugins directory \"%s\" due to the following error: %s", v2Plugins, err)
 		}
-		fmt.Printf("[Helm 2] plugins \"%s\" copied successfully to [Helm 3] data folder \"%s\" .\n", v2Plugins, v3Plugins)
+		log.Printf("[Helm 2] plugins \"%s\" copied successfully to [Helm 3] data folder \"%s\" .\n", v2Plugins, v3Plugins)
 	}
 
 	// Move starters
 	v2Starters := v2HomeDir + sep + "starters"
 	v3Starters := v3DataDir + sep + "starters"
-	fmt.Printf("[Helm 2] starters \"%s\" will copy to [Helm 3] data folder \"%s\" .\n", v2Starters, v3Starters)
+	log.Printf("[Helm 2] starters \"%s\" will copy to [Helm 3] data folder \"%s\" .\n", v2Starters, v3Starters)
 	if !dryRun {
 		err = copyDir(v2Starters, v3Starters)
 		if err != nil {
 			return fmt.Errorf("Failed to copy [Helm 2] starters \"%s\" due to the following error: %s", v2Starters, err)
 		}
-		fmt.Printf("[Helm 2] starters \"%s\" copied successfully to [Helm 3] data folder \"%s\" .\n", v2Starters, v3Starters)
+		log.Printf("[Helm 2] starters \"%s\" copied successfully to [Helm 3] data folder \"%s\" .\n", v2Starters, v3Starters)
 	}
 
 	return nil
@@ -109,7 +110,7 @@ func Copyv2HomeTov3(dryRun bool) error {
 
 // AskConfirmation provides a prompt for user to confirm continuation with operation
 func AskConfirmation(operation, specificMsg string) (bool, error) {
-	fmt.Printf("[%s/confirm] Are you sure you want to %s? [y/N]: ", operation, specificMsg)
+	log.Printf("[%s/confirm] Are you sure you want to %s? [y/N]: ", operation, specificMsg)
 
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()

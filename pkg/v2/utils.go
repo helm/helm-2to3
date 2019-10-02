@@ -18,6 +18,7 @@ package v2
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,12 +32,12 @@ const sep = string(filepath.Separator)
 // RemoveHomeFolder removes the v2 Helm home folder
 func RemoveHomeFolder(dryRun bool) error {
 	homeDir := HomeDir()
-	fmt.Printf("[Helm 2] Home folder \"%s\" will be deleted.\n", homeDir)
+	log.Printf("[Helm 2] Home folder \"%s\" will be deleted.\n", homeDir)
 	if !dryRun {
 		if err := os.RemoveAll(homeDir); err != nil {
 			return fmt.Errorf("[Helm 2] Failed to delete \"%s\" due to the following error: %s.\n", homeDir, err)
 		}
-		fmt.Printf("[Helm 2] Home folder \"%s\" deleted.\n", homeDir)
+		log.Printf("[Helm 2] Home folder \"%s\" deleted.\n", homeDir)
 	}
 	return nil
 
@@ -48,19 +49,19 @@ func RemoveTiller(tillerNamespace string, dryRun bool) error {
 		tillerNamespace = "kube-system"
 	}
 	if !dryRun {
-		fmt.Printf("[Helm 2] Tiller \"%s\" in \"%s\" namespace will be removed.\n", "deploy", tillerNamespace)
+		log.Printf("[Helm 2] Tiller \"%s\" in \"%s\" namespace will be removed.\n", "deploy", tillerNamespace)
 		err := executeKubsDeleteTillerCmd(tillerNamespace, "deploy")
 		if err != nil {
 			return err
 		}
-		fmt.Printf("[Helm 2] Tiller \"%s\" in \"%s\" namespace was removed successfully.\n", "deploy", tillerNamespace)
+		log.Printf("[Helm 2] Tiller \"%s\" in \"%s\" namespace was removed successfully.\n", "deploy", tillerNamespace)
 
-		fmt.Printf("[Helm 2] Tiller \"%s\" in \"%s\" namespace will be removed.\n", "service", tillerNamespace)
+		log.Printf("[Helm 2] Tiller \"%s\" in \"%s\" namespace will be removed.\n", "service", tillerNamespace)
 		err = executeKubsDeleteTillerCmd(tillerNamespace, "service")
 		if err != nil {
 			return err
 		}
-		fmt.Printf("[Helm 2] Tiller \"%s\" in \"%s\" namespace was removed successfully.\n", "service", tillerNamespace)
+		log.Printf("[Helm 2] Tiller \"%s\" in \"%s\" namespace was removed successfully.\n", "service", tillerNamespace)
 	}
 	return nil
 }

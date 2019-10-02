@@ -18,8 +18,8 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 	"io"
+	"log"
 
 	"github.com/spf13/cobra"
 
@@ -89,13 +89,14 @@ func runConvert(cmd *cobra.Command, args []string) error {
 // The Helm 2 release is retained by default, unless the '--delete-v2-releases' flag is set.
 func Convert(convertOptions ConvertOptions) error {
 	if convertOptions.DryRun {
-		fmt.Printf("NOTE: This is in dry-run mode, the following actions will not be executed.\n")
-		fmt.Printf("Run without --dry-run to take the actions described below:\n\n")
+		log.Println("NOTE: This is in dry-run mode, the following actions will not be executed.")
+		log.Println("Run without --dry-run to take the actions described below:")
+		log.Println()
 	}
 
-	fmt.Printf("Release \"%s\" will be converted from Helm v2 to Helm v3.\n", convertOptions.ReleaseName)
+	log.Printf("Release \"%s\" will be converted from Helm v2 to Helm v3.\n", convertOptions.ReleaseName)
 
-	fmt.Printf("[Helm 3] Release \"%s\" will be created.\n", convertOptions.ReleaseName)
+	log.Printf("[Helm 3] Release \"%s\" will be created.\n", convertOptions.ReleaseName)
 
 	retrieveOptions := v2.RetrieveOptions{
 		ReleaseName:      convertOptions.ReleaseName,
@@ -113,21 +114,21 @@ func Convert(convertOptions ConvertOptions) error {
 	for i := len(v2Releases) - 1; i >= 0; i-- {
 		v2Release := v2Releases[i]
 		relVerName := v2.GetReleaseVersionName(convertOptions.ReleaseName, v2Release.Version)
-		fmt.Printf("[Helm 3] ReleaseVersion \"%s\" will be created.\n", relVerName)
+		log.Printf("[Helm 3] ReleaseVersion \"%s\" will be created.\n", relVerName)
 		if !convertOptions.DryRun {
 			if err := createV3ReleaseVersion(v2Release); err != nil {
 				return err
 			}
-			fmt.Printf("[Helm 3] ReleaseVersion \"%s\" created.\n", relVerName)
+			log.Printf("[Helm 3] ReleaseVersion \"%s\" created.\n", relVerName)
 		}
 		versions = append(versions, v2Release.Version)
 	}
 	if !convertOptions.DryRun {
-		fmt.Printf("[Helm 3] Release \"%s\" created.\n", convertOptions.ReleaseName)
+		log.Printf("[Helm 3] Release \"%s\" created.\n", convertOptions.ReleaseName)
 	}
 
 	if convertOptions.DeleteRelease {
-		fmt.Printf("[Helm 2] Release \"%s\" will be deleted.\n", convertOptions.ReleaseName)
+		log.Printf("[Helm 2] Release \"%s\" will be deleted.\n", convertOptions.ReleaseName)
 		deleteOptions := v2.DeleteOptions{
 			DryRun:   convertOptions.DryRun,
 			Versions: versions,
@@ -136,15 +137,15 @@ func Convert(convertOptions ConvertOptions) error {
 			return err
 		}
 		if !convertOptions.DryRun {
-			fmt.Printf("[Helm 2] Release \"%s\" deleted.\n", convertOptions.ReleaseName)
+			log.Printf("[Helm 2] Release \"%s\" deleted.\n", convertOptions.ReleaseName)
 
-			fmt.Printf("Release \"%s\" was converted successfully from Helm v2 to Helm v3.\n", convertOptions.ReleaseName)
+			log.Printf("Release \"%s\" was converted successfully from Helm v2 to Helm v3.\n", convertOptions.ReleaseName)
 		}
 	} else {
 		if !convertOptions.DryRun {
-			fmt.Printf("Release \"%s\" was converted successfully from Helm v2 to Helm v3.\n", convertOptions.ReleaseName)
-			fmt.Printf("Note: The v2 release information still remains and should be removed to avoid conflicts with the migrated v3 release.\n")
-			fmt.Printf("v2 release information should only be removed using `helm 2to3` cleanup and when all releases have been migrated over.\n")
+			log.Printf("Release \"%s\" was converted successfully from Helm v2 to Helm v3.\n", convertOptions.ReleaseName)
+			log.Println("Note: The v2 release information still remains and should be removed to avoid conflicts with the migrated v3 release.")
+			log.Println("v2 release information should only be removed using `helm 2to3` cleanup and when all releases have been migrated over.")
 		}
 	}
 
