@@ -54,6 +54,7 @@ by the Helm v2 client instance. [Clean up](#clean-up-helm-v2-data) should only b
 
 - Helm v2 client installed on a system which manages releases on one to many clusters
 - Helm v3 client with `2to3` plugin installed on the same system
+- If `export KUBECONFIG` is used to point to the Kubernetes cluster, it must have only one `kubeconfig` file e.g. `export KUBECONFIG=cluster1_config` as plugin doesn't handle multiple `kubeconfig` files.
 
 ## Install
 
