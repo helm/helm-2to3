@@ -93,9 +93,21 @@ func Cleanup(cleanupOptions CleanupOptions) error {
 		log.Println()
 	}
 
-	log.Println("WARNING: Helm v2 Configuration, Release Data and Tiller Deployment will be removed.")
-	log.Println("This will clean up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.")
-	log.Println("Helm v2 will not be usable afterwards.")
+	warningMsg := "WARNING: "
+	if cleanupOptions.ConfigCleanup {
+		warningMsg = warningMsg + "\"Helm v2 Configuration\" "
+	}
+	if cleanupOptions.ReleaseCleanup {
+		warningMsg = warningMsg + "\"Release Data\" "
+	}
+	if cleanupOptions.TillerCleanup {
+		warningMsg = warningMsg + "\"Tiller Deployment\" "
+	}
+	log.Print(warningMsg + "will be removed.")
+	if cleanupOptions.ReleaseCleanup {
+		log.Println("This will clean up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.")
+	}
+	log.Println("Helm v2 may not be usable afterwards.")
 	log.Println()
 
 	doCleanup, err := common.AskConfirmation("Cleanup", "cleanup Helm v2 data")
