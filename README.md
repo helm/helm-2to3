@@ -122,12 +122,18 @@ Flags:
 ```
       --dry-run                  simulate a command
   -h, --help                     help for convert
-      --delete-v2-releases       v2 releases are deleted after migration. By default, the v2 releases are retained
+      --delete-v2-releases       v2 release versions are deleted after migration. By default, the v2 release versions are retained
   -l, --label string             label to select Tiller resources by (default "OWNER=TILLER")
   -s, --release-storage string   v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag (default "secrets")
+      --release-versions-max int limit the maximum number of versions converted per release. Use 0 for no limit (default 10)
   -t, --tiller-ns string         namespace of Tiller (default "kube-system")
       --tiller-out-cluster       when Tiller is not running in the cluster e.g. Tillerless
 ```
+
+*Note:* There is a limit set on the number of versions/revisions of a release that are converted. It is defaulted to 10 but can be configured with the `--release-versions-max` flag.
+When the limit set is less that the actual number of versions then only the latest release versions up to the limit will be converted. Older release versions with not be converted.
+If `--delete-v2-releases ` is set, thes older versions will remain in Helm v2 storage but will no longer be visible to Helm v2 commands like `helm list`. [Clean up](#clean-up-helm-v2-data)
+will remove them from storage.
 
 ### Clean up Helm v2 data
 

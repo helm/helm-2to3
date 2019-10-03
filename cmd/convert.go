@@ -30,17 +30,19 @@ import (
 )
 
 var (
-	deletev2Releases bool
+	deletev2Releases   bool
+	maxReleaseVersions int
 )
 
 type ConvertOptions struct {
-	DeleteRelease    bool
-	DryRun           bool
-	ReleaseName      string
-	StorageType      string
-	TillerLabel      string
-	TillerNamespace  string
-	TillerOutCluster bool
+	DeleteRelease      bool
+	DryRun             bool
+	MaxReleaseVersions int
+	ReleaseName        string
+	StorageType        string
+	TillerLabel        string
+	TillerNamespace    string
+	TillerOutCluster   bool
 }
 
 func newConvertCmd(out io.Writer) *cobra.Command {
@@ -60,7 +62,8 @@ func newConvertCmd(out io.Writer) *cobra.Command {
 	flags := cmd.Flags()
 	settings.AddFlags(flags)
 
-	flags.BoolVar(&deletev2Releases, "delete-v2-releases", false, "v2 releases are deleted after migration. By default, the v2 releases are retained")
+	flags.BoolVar(&deletev2Releases, "delete-v2-releases", false, "v2 release versions are deleted after migration. By default, the v2 release versions are retained")
+	flags.IntVar(&maxReleaseVersions, "release-versions-max", 10, "limit the maximum number of versions converted per release. Use 0 for no limit")
 
 	return cmd
 
@@ -72,13 +75,14 @@ func runConvert(cmd *cobra.Command, args []string) error {
 		return errors.New("release-storage flag needs to be 'configmaps' or 'secrets'")
 	}
 	convertOptions := ConvertOptions{
-		DeleteRelease:    deletev2Releases,
-		DryRun:           settings.dryRun,
-		ReleaseName:      releaseName,
-		StorageType:      settings.releaseStorage,
-		TillerLabel:      settings.label,
-		TillerNamespace:  settings.tillerNamespace,
-		TillerOutCluster: settings.tillerOutCluster,
+		DeleteRelease:      deletev2Releases,
+		DryRun:             settings.dryRun,
+		MaxReleaseVersions: maxReleaseVersions,
+		ReleaseName:        releaseName,
+		StorageType:        settings.releaseStorage,
+		TillerLabel:        settings.label,
+		TillerNamespace:    settings.tillerNamespace,
+		TillerOutCluster:   settings.tillerOutCluster,
 	}
 	return Convert(convertOptions)
 }
@@ -110,8 +114,22 @@ func Convert(convertOptions ConvertOptions) error {
 		return err
 	}
 
+	// Limit release versions to migrate.
+	// Limit is based on newest versions.
+	v2RelVerLen := len(v2Releases)
+	if convertOptions.MaxReleaseVersions > 0 && convertOptions.MaxReleaseVersions < v2RelVerLen {
+		log.Println()
+		log.Printf("NOTE: The max release versions \"%d\" is less than the actual release versions \"%d\".", convertOptions.MaxReleaseVersions, v2RelVerLen)
+		log.Printf("This means only \"%d\" of the latest release versions will be converted.", convertOptions.MaxReleaseVersions)
+		if convertOptions.DeleteRelease {
+			log.Println("This also means some versions will remain in Helm v2 storage that will no longer be visible to Helm v2 commands like 'helm list'. Plugin 'cleanup' command will remove them from storage.")
+		}
+		log.Println()
+		v2RelVerLen = convertOptions.MaxReleaseVersions
+	}
+
 	versions := []int32{}
-	for i := len(v2Releases) - 1; i >= 0; i-- {
+	for i := v2RelVerLen - 1; i >= 0; i-- {
 		v2Release := v2Releases[i]
 		relVerName := v2.GetReleaseVersionName(convertOptions.ReleaseName, v2Release.Version)
 		log.Printf("[Helm 3] ReleaseVersion \"%s\" will be created.\n", relVerName)
