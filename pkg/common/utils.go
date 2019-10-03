@@ -178,7 +178,7 @@ func copyDir(srcDirName, destDirName string) error {
 
 func ensureDir(dirName string) error {
 	err := os.MkdirAll(dirName, os.ModePerm)
-	if err != nil || !os.IsExist(err) {
+	if err != nil && !os.IsExist(err) {
 		return err
 	}
 	return nil
