@@ -41,7 +41,7 @@ Here are some suggestions to mitigate against potential risks during migration:
      *Note:*: Only use the plugin to do clean up. Using `helm`, `kubectl` or other tools could lead to data loss and an indeterminate
       state for the release(s).  
 
-*Note:*
+**Note:**
 A Helm v2 client: 
 - can manage 1 to many Kubernetes clusters.
 - can connect to 1 to many Tiller instances for  a cluster.
@@ -54,6 +54,7 @@ by the Helm v2 client instance. [Clean up](#clean-up-helm-v2-data) should only b
 
 - Helm v2 client installed on a system which manages releases on one to many clusters
 - Helm v3 client with `2to3` plugin installed on the same system
+- Access to the cluster(s) that Helm v2 client is managing and which Helm v3 will manage after migration. This access is similar to `kubectl` access using [kubeconfig files](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/). **Note:** If using the `KUBECONFIG` environment value, the plugin only supports a single **kubeconfig** file and not a list of them
 
 ## Install
 
@@ -88,7 +89,7 @@ It will migrate:
 - Repositories
 - Plugins 
 
-*Note:*
+**Note:**
 - The `move config` command will create the Helm v3 config and data folders if they don't exist, and will override the `repositories.yaml` file if it does exist.
 - For migration it uses default Helm v2 home and v3 config and data folders. To override those folders you need to set environment variables
 `HELM_V2_HOME`, `HELM_V3_CONFIG` and `HELM_V3_DATA`:
@@ -130,7 +131,7 @@ Flags:
       --tiller-out-cluster       when Tiller is not running in the cluster e.g. Tillerless
 ```
 
-*Note:* There is a limit set on the number of versions/revisions of a release that are converted. It is defaulted to 10 but can be configured with the `--release-versions-max` flag.
+**Note:** There is a limit set on the number of versions/revisions of a release that are converted. It is defaulted to 10 but can be configured with the `--release-versions-max` flag.
 When the limit set is less that the actual number of versions then only the latest release versions up to the limit will be converted. Older release versions with not be converted.
 If `--delete-v2-releases ` is set, thes older versions will remain in Helm v2 storage but will no longer be visible to Helm v2 commands like `helm list`. [Clean up](#clean-up-helm-v2-data)
 will remove them from storage.
@@ -170,7 +171,7 @@ $ export HELM_V2_HOME=$PWD/.helm2
 $ helm 2to3 cleanup
 ```
 
-*Warning:* The `cleanup` command will remove the Helm v2 Configuration, Release Data and Tiller Deployment.
+**Warning:** The `cleanup` command will remove the Helm v2 Configuration, Release Data and Tiller Deployment.
 It cleans up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.
 Helm v2 will not be usable afterwards. Cleanup should only be run once all migration (clusters and Tiller instances) for a Helm v2 client instance is complete.
 
