@@ -24,11 +24,11 @@ import (
 
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 
-	"helm.sh/helm/pkg/action"
-	"helm.sh/helm/pkg/cli"
-	"helm.sh/helm/pkg/kube"
-	"helm.sh/helm/pkg/storage"
-	"helm.sh/helm/pkg/storage/driver"
+	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/kube"
+	"helm.sh/helm/v3/pkg/storage"
+	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
 var (

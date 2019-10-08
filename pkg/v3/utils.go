@@ -19,7 +19,7 @@ package v3
 import (
 	"os"
 
-	"helm.sh/helm/pkg/helmpath"
+	"helm.sh/helm/v3/pkg/helmpath"
 )
 
 // ConfigDir returns the v2 config directory
