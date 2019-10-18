@@ -62,7 +62,7 @@ func CreateRelease(v2Rel *v2rls.Release) (*release.Release, error) {
 	if !ok {
 		return nil, fmt.Errorf("Failed to convert status")
 	}
-	hooks, err := mapHooks(v2Rel.Hooks)
+	hooks, err := mapHooks(v2Rel.Hooks, v2Rel.Info.Status.LastTestSuiteRun)
 	if err != nil {
 		return nil, err
 	}
@@ -108,10 +108,11 @@ func mapv2ChartTov3Chart(v2Chrt *v2chart.Chart) (*chart.Chart, error) {
 		return nil, err
 	}
 	v3Chrt.Files = mapFiles(v2Chrt.Files)
-	//TODO
-	//v3Chrt.Schema
-	//TODO
-	//v3Chrt.Lock = new(chart.Lock)
+	// Schema is set to nil as Schema wass introduced in Helm v3
+	v3Chrt.Schema = nil
+	// Lock is set to nil because v2 does not save the requirements lock file details
+	// v3 should gather data as need be from the chart dependencies
+	v3Chrt.Lock = nil
 	return v3Chrt, nil
 }
 
@@ -135,7 +136,9 @@ func mapMetadata(v2Chrt *v2chart.Chart) *chart.Metadata {
 	metadata.Deprecated = v2Chrt.Metadata.Deprecated
 	metadata.Annotations = v2Chrt.Metadata.Annotations
 	metadata.KubeVersion = v2Chrt.Metadata.KubeVersion
-	//TODO: metadata.Dependencies =
+	// v2 does not save the dependency metadat from requirements, so setting to nil
+	// v3 should gather data as need be from the chart dependencies
+	metadata.Dependencies = nil
 	//Default to application
 	metadata.Type = "application"
 	return metadata
@@ -209,7 +212,7 @@ func mapFiles(v2Files []*any.Any) []*chart.File {
 	return files
 }
 
-func mapHooks(v2Hooks []*v2rls.Hook) ([]*release.Hook, error) {
+func mapHooks(v2Hooks []*v2rls.Hook, v2LastTestSuiteRun *v2rls.TestSuite) ([]*release.Hook, error) {
 	if v2Hooks == nil {
 		return nil, nil
 	}
@@ -234,7 +237,14 @@ func mapHooks(v2Hooks []*v2rls.Hook) ([]*release.Hook, error) {
 			return nil, err
 		}
 		hook.DeletePolicies = policies
-		//TODO: hook.LastRun =
+		var lastRun *release.HookExecution
+		lastRun, err = mapTestSuiteToHookExecution(hook.Name, v2LastTestSuiteRun)
+		if err != nil {
+			return nil, err
+		}
+		if lastRun != nil {
+			hook.LastRun = *lastRun
+		}
 		hooks = append(hooks, hook)
 	}
 	return hooks, nil
@@ -282,4 +292,41 @@ func mapTimestampToTime(ts *timestamp.Timestamp) (time.Time, error) {
 		}
 	}
 	return mappedTime, nil
+}
+
+func mapTestSuiteToHookExecution(hookName string, testSuite *v2rls.TestSuite) (*release.HookExecution, error) {
+	if testSuite == nil {
+		return nil, nil
+	}
+
+	testSuiteResLen := len(testSuite.Results)
+
+	if testSuiteResLen <= 0 {
+		return nil, nil
+	}
+
+	for i := 0; i < testSuiteResLen; i++ {
+		testRun := testSuite.Results[i]
+		if testRun.Name != hookName {
+			continue
+		}
+		hookEx := new(release.HookExecution)
+		var err error
+		hookEx.StartedAt, err = mapTimestampToTime(testRun.StartedAt)
+		if err != nil {
+			return nil, err
+		}
+		hookEx.CompletedAt, err = mapTimestampToTime(testRun.CompletedAt)
+		if err != nil {
+			return nil, err
+		}
+		v2RunStatusStr, ok := v2rls.TestRun_Status_name[int32(testRun.Status)]
+		if !ok {
+			return nil, fmt.Errorf("Failed to convert test run status")
+		}
+		hookEx.Phase = release.HookPhase(strings.Title((strings.ToLower(v2RunStatusStr))))
+		return hookEx, nil
+	}
+
+	return nil, nil
 }
