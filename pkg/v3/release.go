@@ -19,7 +19,7 @@ package v3
 import (
 	"fmt"
 	"strings"
-	"time"
+	stdtime "time"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/any"
@@ -27,6 +27,7 @@ import (
 
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/release"
+	"helm.sh/helm/v3/pkg/time"
 
 	v2chrtutil "k8s.io/helm/pkg/chartutil"
 	v2chart "k8s.io/helm/pkg/proto/hapi/chart"
@@ -283,15 +284,15 @@ func mapHookDeletePolicies(v2HookDelPolicies []v2rls.Hook_DeletePolicy) ([]relea
 }
 
 func mapTimestampToTime(ts *timestamp.Timestamp) (time.Time, error) {
-	var mappedTime time.Time
+	var mappedTime stdtime.Time
 	var err error
 	if ts != nil {
 		mappedTime, err = ptypes.Timestamp(ts)
 		if err != nil {
-			return mappedTime, err
+			return time.Time{Time: mappedTime}, err
 		}
 	}
-	return mappedTime, nil
+	return time.Time{Time: mappedTime}, nil
 }
 
 func mapTestSuiteToHookExecution(hookName string, testSuite *v2rls.TestSuite) (*release.HookExecution, error) {
