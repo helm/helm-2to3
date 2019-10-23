@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/Masterminds/semver v1.4.2 // indirect
 	github.com/fatih/color v1.7.0 // indirect
+	github.com/ghodss/yaml v1.0.1-0.20180820084758-c7ce16629ff4 // indirect
 	github.com/golang/protobuf v1.3.1
 	github.com/gosuri/uitable v0.0.3 // indirect
 	github.com/maorfr/helm-plugin-utils v0.0.0-20181205064038-588190cb5e3b
@@ -13,10 +14,9 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.3
-	helm.sh/helm/v3 v3.0.0-beta.4
+	helm.sh/helm/v3 v3.0.0-beta.5
 	k8s.io/apimachinery v0.0.0
-	k8s.io/cli-runtime v0.0.0
-	k8s.io/helm v2.14.3+incompatible
+	k8s.io/helm v2.15.1+incompatible
 )
 
 replace (
