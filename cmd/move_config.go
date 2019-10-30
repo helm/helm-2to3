@@ -23,7 +23,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"helm-2to3/pkg/common"
+	"github.com/helm/helm-2to3/pkg/common"
 )
 
 func newMoveConfigCmd(out io.Writer) *cobra.Command {

@@ -1,4 +1,4 @@
-module helm-2to3
+module github.com/helm/helm-2to3
 
 go 1.13
 

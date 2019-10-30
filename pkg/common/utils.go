@@ -27,8 +27,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"helm-2to3/pkg/v2"
-	"helm-2to3/pkg/v3"
+	v2 "github.com/helm/helm-2to3/pkg/v2"
+	v3 "github.com/helm/helm-2to3/pkg/v3"
 )
 
 const sep = string(filepath.Separator)

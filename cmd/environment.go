@@ -16,9 +16,7 @@ limitations under the License.
 
 package cmd
 
-import (
-	"github.com/spf13/pflag"
-)
+import "github.com/spf13/pflag"
 
 type EnvSettings struct {
 	tillerNamespace  string

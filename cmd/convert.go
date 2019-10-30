@@ -22,11 +22,10 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
-
-	"helm-2to3/pkg/v2"
-	"helm-2to3/pkg/v3"
-
 	v2rel "k8s.io/helm/pkg/proto/hapi/release"
+
+	v2 "github.com/helm/helm-2to3/pkg/v2"
+	v3 "github.com/helm/helm-2to3/pkg/v3"
 )
 
 var (
