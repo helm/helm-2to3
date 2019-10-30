@@ -17,6 +17,7 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"io"
 	"log"
 
@@ -103,23 +104,23 @@ func Cleanup(cleanupOptions CleanupOptions) error {
 	if cleanupOptions.TillerCleanup {
 		warningMsg = warningMsg + "\"Tiller Deployment\" "
 	}
-	log.Print(warningMsg + "will be removed.")
+	fmt.Print(warningMsg + "will be removed.")
 	if cleanupOptions.ReleaseCleanup {
-		log.Println("This will clean up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.")
+		fmt.Println("This will clean up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.")
 	}
-	log.Println("Helm v2 may not be usable afterwards.")
-	log.Println()
+	fmt.Println("Helm v2 may not be usable afterwards.")
+	fmt.Println()
 
 	doCleanup, err := common.AskConfirmation("Cleanup", "cleanup Helm v2 data")
 	if err != nil {
 		return err
 	}
 	if !doCleanup {
-		log.Println("Cleanup will not proceed as the user didn't answer (Y|y) in order to continue.")
+		fmt.Println("Cleanup will not proceed as the user didn't answer (Y|y) in order to continue.")
 		return nil
 	}
 
-	log.Printf("\nHelm v2 data will be cleaned up.\n")
+	fmt.Printf("Helm v2 data will be cleaned up.\n")
 
 	if cleanupOptions.ReleaseCleanup {
 		log.Println("[Helm 2] Releases will be deleted.")
