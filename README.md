@@ -39,13 +39,13 @@ Here are some suggestions to mitigate against potential risks during migration:
   3. Migrate [Helm v2 releases](#migrate-helm-v2-releases).
   4. When happy that Helm v3 is managing Helm v2 data as expected, then [clean up](#clean-up-helm-v2-data) Helm v2 data.
      *Note:*: Only use the plugin to do clean up. Using `helm`, `kubectl` or other tools could lead to data loss and an indeterminate
-      state for the release(s).  
+      state for the release(s).
 
 **Note:**
-A Helm v2 client: 
+A Helm v2 client:
 - can manage 1 to many Kubernetes clusters.
 - can connect to 1 to many Tiller instances for  a cluster.
- 
+
 This means that you have to cognisant of this when migrating as releases are deployed into clusters by Tiller and
 its namespace. You have to therefore be aware of migrating for each cluster and each Tiller instance that is managed
 by the Helm v2 client instance. [Clean up](#clean-up-helm-v2-data) should only be run once all migration for a Helm v2 client is complete.
@@ -87,7 +87,7 @@ Flags:
 It will migrate:
 - Chart starters
 - Repositories
-- Plugins 
+- Plugins
 
 **Note:**
 - The `move config` command will create the Helm v3 config and data folders if they don't exist, and will override the `repositories.yaml` file if it does exist.
@@ -160,7 +160,7 @@ It will clean:
 - v2 release data
 - Tiller deployment
 
-Clean up can be done individually also, by setting one or all of the following flags: `--config-cleanup`, `--release-cleanup` and `--tiller-cleanup`. 
+Clean up can be done individually also, by setting one or all of the following flags: `--config-cleanup`, `--release-cleanup` and `--tiller-cleanup`.
 If none of these flag are set, then all cleanup is performed.
 
 For cleanup it uses the default Helm v2 home folder.
@@ -189,10 +189,10 @@ Hang tight while we grab the latest from your chart repositories...
 ...Successfully got an update from the "stable" chart repository
 Update Complete. ⎈Happy Helming!⎈
 Error: open /home/usr1/.cache/helm/repository/local-index.yaml: no such file or directory
-``` 
+```
 
-A. Local respoitories are not copied to Helm v3. You therefore need to remove all local repositories from Helm v3 using `<helm3> repo remove` and re-add where 
-required using `<helm3> repo add`. This is a necessary refresh to align references for Helm v3 and remove the conflict. It is worthwhile to also refresh the 
+A. Local respoitories are not copied to Helm v3. You therefore need to remove all local repositories from Helm v3 using `<helm3> repo remove` and re-add where
+required using `<helm3> repo add`. This is a necessary refresh to align references for Helm v3 and remove the conflict. It is worthwhile to also refresh the
 repository list afterwards: `<helm3> repo update`. You should then be able to run the chart dependency update command successfully.
 
 ## Developer (From Source) Install
@@ -202,6 +202,8 @@ If you would like to handle the build yourself, this is the recommended way to d
 You must first have [Go v1.13](http://golang.org) installed, and then you run:
 
 ```console
+$ mkdir -p ${GOPATH}/src/github.com/helm
+$ cd $_
 $ git clone git@github.com:helm/helm-2to3.git
 $ cd helm-2to3
 $ make build
