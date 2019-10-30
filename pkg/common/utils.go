@@ -110,7 +110,7 @@ func Copyv2HomeTov3(dryRun bool) error {
 
 // AskConfirmation provides a prompt for user to confirm continuation with operation
 func AskConfirmation(operation, specificMsg string) (bool, error) {
-	log.Printf("[%s/confirm] Are you sure you want to %s? [y/N]: ", operation, specificMsg)
+	fmt.Printf("[%s/confirm] Are you sure you want to %s? [y/N]: ", operation, specificMsg)
 
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
