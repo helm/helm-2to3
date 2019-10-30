@@ -17,8 +17,10 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
 	"io"
 	"log"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -81,6 +83,8 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 // the Tiller server deployed as per namespace and owner label. It is also delete the Helm gv2 home directory
 // which contains the Helm configuration. Helm v2 will be unusable after this operation.
 func Cleanup(cleanupOptions CleanupOptions) error {
+	var message strings.Builder
+
 	if !cleanupOptions.ConfigCleanup && !cleanupOptions.ReleaseCleanup && !cleanupOptions.TillerCleanup {
 		cleanupOptions.ConfigCleanup = true
 		cleanupOptions.ReleaseCleanup = true
@@ -93,22 +97,23 @@ func Cleanup(cleanupOptions CleanupOptions) error {
 		log.Println()
 	}
 
-	warningMsg := "WARNING: "
+	fmt.Fprint(&message, "WARNING: ")
 	if cleanupOptions.ConfigCleanup {
-		warningMsg = warningMsg + "\"Helm v2 Configuration\" "
+		fmt.Fprint(&message, "\"Helm v2 Configuration\" ")
 	}
 	if cleanupOptions.ReleaseCleanup {
-		warningMsg = warningMsg + "\"Release Data\" "
+		fmt.Fprint(&message, "\"Release Data\" ")
 	}
 	if cleanupOptions.TillerCleanup {
-		warningMsg = warningMsg + "\"Tiller Deployment\" "
+		fmt.Fprint(&message, "\"Release Data\" ")
 	}
-	log.Print(warningMsg + "will be removed. ")
+	fmt.Fprintln(&message, "will be removed. ")
 	if cleanupOptions.ReleaseCleanup {
-		log.Println("This will clean up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.")
+		fmt.Fprintln(&message, "This will clean up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.")
 	}
-	log.Println("Helm v2 may not be usable afterwards.")
-	log.Println()
+	fmt.Fprintln(&message, "Helm v2 may not be usable afterwards.")
+
+	fmt.Println(message.String())
 
 	doCleanup, err := common.AskConfirmation("Cleanup", "cleanup Helm v2 data")
 	if err != nil {
