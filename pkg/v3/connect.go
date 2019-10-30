@@ -32,7 +32,7 @@ var (
 // GetActionConfig returns action configuration based on Helm env
 func GetActionConfig(namespace string) (*action.Configuration, error) {
 	actionConfig := new(action.Configuration)
-	err := actionConfig.Init(settings, false, os.Getenv("HELM_DRIVER"), debug)
+	err := actionConfig.Init(settings.RESTClientGetter(), namespace, os.Getenv("HELM_DRIVER"), debug)
 	if err != nil {
 		return nil, err
 	}
