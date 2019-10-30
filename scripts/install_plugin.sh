@@ -13,7 +13,11 @@ url=""
 if [ "$(uname)" = "Darwin" ]; then
     url="https://github.com/helm/helm-2to3/releases/download/v${version}/helm-2to3_${version}_darwin_amd64.tar.gz"
 elif [ "$(uname)" = "Linux" ] ; then
-    url="https://github.com/helm/helm-2to3/releases/download/v${version}/helm-2to3_${version}_linux_amd64.tar.gz"
+    if [ "$(uname -m)" = "aarch64" ] || [ "$(uname -m)" = "arm64" ]; then
+        url="https://github.com/helm/helm-2to3/releases/download/v${version}/helm-2to3_${version}_linux_arm64.tar.gz"
+    else
+        url="https://github.com/helm/helm-2to3/releases/download/v${version}/helm-2to3_${version}_linux_amd64.tar.gz"
+    fi
 else
     url="https://github.com/helm/helm-2to3/releases/download/v${version}/helm-2to3_${version}_windows_amd64.tar.gz"
 fi
