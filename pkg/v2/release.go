@@ -19,6 +19,7 @@ package v2
 import (
 	"fmt"
 	"log"
+	"sort"
 
 	utils "github.com/maorfr/helm-plugin-utils/pkg"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,6 +39,13 @@ type DeleteOptions struct {
 	DryRun   bool
 	Versions []int32
 }
+
+// ByReleaseVersion implements sort.Interface based on the rls.Release Version field
+type ByReleaseVersion []*rls.Release
+
+func (releases ByReleaseVersion) Len() int           { return len(releases) }
+func (releases ByReleaseVersion) Less(i, j int) bool { return releases[i].Version < releases[j].Version }
+func (releases ByReleaseVersion) Swap(i, j int)      { releases[i], releases[j] = releases[j], releases[i] }
 
 // GetReleaseVersions returns all release versions from Helm v2 storage for a specified release..
 // It is based on Tiller namespace and labels like owner of storage.
@@ -89,13 +97,14 @@ func DeleteAllReleaseVersions(retOpts RetrieveOptions, dryRun bool) error {
 	if err != nil {
 		return err
 	}
-	if len(releases) <= 0 {
+	releaseLen := len(releases)
+	if releaseLen <= 0 {
 		log.Printf("[Helm 2] no deployed releases for namespace: %s, owner: %s\n", retOpts.TillerNamespace, retOpts.TillerLabel)
 		return nil
 	}
 
 	// Delete each release version from storage
-	for i := len(releases) - 1; i >= 0; i-- {
+	for i := 0; i < releaseLen; i++ {
 		release := releases[i]
 		relVerName := GetReleaseVersionName(release.Name, release.Version)
 		log.Printf("[Helm 2] ReleaseVersion \"%s\" will be deleted.\n", relVerName)
@@ -156,9 +165,7 @@ func getReleases(retOpts RetrieveOptions) ([]*rls.Release, error) {
 		}
 	}
 
-	if len(releases) > 1 {
-		releases = reverse(releases)
-	}
+	sort.Sort(ByReleaseVersion(releases))
 
 	return releases, nil
 }
@@ -194,12 +201,4 @@ func deleteRelease(retOpts RetrieveOptions, releaseVersionName string) error {
 		return clientSet.CoreV1().ConfigMaps(retOpts.TillerNamespace).Delete(releaseVersionName, &metav1.DeleteOptions{})
 	}
 	return nil
-}
-
-func reverse(releases []*rls.Release) []*rls.Release {
-	for i := 0; i < len(releases)/2; i++ {
-		j := len(releases) - i - 1
-		releases[i], releases[j] = releases[j], releases[i]
-	}
-	return releases
 }
