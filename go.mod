@@ -10,9 +10,9 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
-	helm.sh/helm/v3 v3.0.0-rc.3
+	helm.sh/helm/v3 v3.0.0
 	k8s.io/apimachinery v0.0.0-20191004115801-a2eda9f80ab8
-	k8s.io/helm v2.16.0+incompatible
+	k8s.io/helm v2.16.1+incompatible
 )
 
 replace github.com/docker/docker => github.com/docker/docker v0.0.0-20190731150326-928381b2215c
