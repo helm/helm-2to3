@@ -116,6 +116,7 @@ func Convert(convertOptions ConvertOptions) error {
 	// Limit release versions to migrate.
 	// Limit is based on newest versions.
 	v2RelVerLen := len(v2Releases)
+	startIndex := 0
 	if convertOptions.MaxReleaseVersions > 0 && convertOptions.MaxReleaseVersions < v2RelVerLen {
 		log.Println()
 		log.Printf("NOTE: The max release versions \"%d\" is less than the actual release versions \"%d\".", convertOptions.MaxReleaseVersions, v2RelVerLen)
@@ -124,11 +125,11 @@ func Convert(convertOptions ConvertOptions) error {
 			log.Println("This also means some versions will remain in Helm v2 storage that will no longer be visible to Helm v2 commands like 'helm list'. Plugin 'cleanup' command will remove them from storage.")
 		}
 		log.Println()
-		v2RelVerLen = convertOptions.MaxReleaseVersions
+		startIndex = v2RelVerLen - convertOptions.MaxReleaseVersions
 	}
 
 	versions := []int32{}
-	for i := v2RelVerLen - 1; i >= 0; i-- {
+	for i := startIndex; i < v2RelVerLen; i++ {
 		v2Release := v2Releases[i]
 		relVerName := v2.GetReleaseVersionName(convertOptions.ReleaseName, v2Release.Version)
 		log.Printf("[Helm 3] ReleaseVersion \"%s\" will be created.\n", relVerName)
