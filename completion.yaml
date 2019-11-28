@@ -1,0 +1,31 @@
+commands:
+- name: cleanup
+  flags:
+  - config-cleanup
+  - dry-run
+  - l
+  - label
+  - release-cleanup
+  - s
+  - release-storage
+  - tiller-cleanup
+  - t
+  - tiller-ns
+  - tiller-out-cluster
+- name: convert
+  flags:
+  - delete-v2-releases
+  - dry-run
+  - l
+  - label
+  - s
+  - release-storage
+  - release-versions-max
+  - t
+  - tiller-ns
+  - tiller-out-cluster
+- name: move
+  commands:
+  - name: config
+    flags:
+    - dry-run
