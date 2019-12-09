@@ -195,6 +195,16 @@ A. Local respoitories are not copied to Helm v3. You therefore need to remove al
 required using `<helm3> repo add`. This is a necessary refresh to align references for Helm v3 and remove the conflict. It is worthwhile to also refresh the
 repository list afterwards: `<helm3> repo update`. You should then be able to run the chart dependency update command successfully.
 
+## Frequently Asked Questions
+
+***Q. How do you perform Helm v2 release migration as a batch operation?***
+
+A. You can perform batch migration of releases using a command as follows:
+`kubectl get [configmap|secret] -n <tiller_namespace> -l "OWNER=TILLER" | awk '{print $1}' | grep -v NAME | cut -d '.' -f1 | uniq | xargs -n1 helm 2to3 convert`
+
+An example of migrating releases which are stored as ConfigMaps in Tiller namespace `kube-system`:
+`kubectl get configmap -n kube-system -l "OWNER=TILLER" | awk '{print $1}' | grep -v NAME | cut -d '.' -f1 | uniq | xargs -n1 helm 2to3 convert`
+
 ## Developer (From Source) Install
 
 If you would like to handle the build yourself, this is the recommended way to do it.
