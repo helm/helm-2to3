@@ -152,7 +152,11 @@ func copyFile(srcFileName, destFileName string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(destFileName, input, 0644)
+	st, err := os.Stat(srcFileName)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(destFileName, input, st.Mode())
 	if err != nil {
 		return err
 	}
