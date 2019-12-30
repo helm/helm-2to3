@@ -200,10 +200,18 @@ repository list afterwards: `<helm3> repo update`. You should then be able to ru
 ***Q. How do you perform Helm v2 release migration as a batch operation?***
 
 A. You can perform batch migration of releases using a command as follows:
-`kubectl get [configmap|secret] -n <tiller_namespace> -l "OWNER=TILLER" | awk '{print $1}' | grep -v NAME | cut -d '.' -f1 | uniq | xargs -n1 helm 2to3 convert`
+
+```console
+$ kubectl get [configmap|secret] -n <tiller_namespace> \ 
+ -l "OWNER=TILLER" | awk '{print $1}' | grep -v NAME | cut -d '.' -f1 | uniq | xargs -n1 helm 2to3 convert
+```
 
 An example of migrating releases which are stored as ConfigMaps in Tiller namespace `kube-system`:
-`kubectl get configmap -n kube-system -l "OWNER=TILLER" | awk '{print $1}' | grep -v NAME | cut -d '.' -f1 | uniq | xargs -n1 helm 2to3 convert`
+
+```console
+$ kubectl get configmap -n kube-system -l "OWNER=TILLER" \
+ | awk '{print $1}' | grep -v NAME | cut -d '.' -f1 | uniq | xargs -n1 helm 2to3 convert
+```
 
 ## Developer (From Source) Install
 
