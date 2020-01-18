@@ -66,7 +66,7 @@ func Move(dryRun bool) error {
 
 	log.Println("WARNING: Helm v3 configuration maybe overwritten during this operation.")
 	log.Println()
-	doCleanup, err := common.AskConfirmation("Move Config", "move the v2 configration")
+	doCleanup, err := common.AskConfirmation("Move Config", "move the v2 configuration")
 	if err != nil {
 		return err
 	}
@@ -75,13 +75,13 @@ func Move(dryRun bool) error {
 		return nil
 	}
 
-	log.Println("\nHelm v2 configuration will be moved to Helm v3 configration.")
+	log.Println("\nHelm v2 configuration will be moved to Helm v3 configuration.")
 	err = common.Copyv2HomeTov3(dryRun)
 	if err != nil {
 		return err
 	}
 	if !dryRun {
-		log.Println("Helm v2 configuration was moved successfully to Helm v3 configration.")
+		log.Println("Helm v2 configuration was moved successfully to Helm v3 configuration.")
 	}
 	return nil
 }
