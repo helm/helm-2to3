@@ -54,7 +54,7 @@ by the Helm v2 client instance. [Clean up](#clean-up-helm-v2-data) should only b
 
 - Helm v2 client installed on a system which manages releases on one to many clusters
 - Helm v3 client with `2to3` plugin installed on the same system
-- Access to the cluster(s) that Helm v2 client is managing and which Helm v3 will manage after migration. This access is similar to `kubectl` access using [kubeconfig files](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/). **Note:** If using the `KUBECONFIG` environment value, the plugin only supports a single **kubeconfig** file and not a list of them
+- Access to the cluster(s) that Helm v2 client is managing and which Helm v3 will manage after migration. This access is similar to `kubectl` access using [kubeconfig files](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/).
 - Access to the `tiller` namespace for required RBAC roles. If `Tillerless` setup, then a service account with the proper cluster wide RBAC roles will need to be used. If not used, `forbidden` errors will be thrown when trying to access restricted resources. 
 
 ## Install
