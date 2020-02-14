@@ -5,14 +5,17 @@ go 1.13
 require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/golang/protobuf v1.3.2
-	github.com/maorfr/helm-plugin-utils v0.0.0-20200122063613-46a47fc1844f
+	github.com/maorfr/helm-plugin-utils v0.0.0-20200214063243-72d38266051c
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/pkg/errors v0.8.1
+	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5
-	helm.sh/helm/v3 v3.0.2
-	k8s.io/apimachinery v0.0.0-20191004115801-a2eda9f80ab8
-	k8s.io/helm v2.16.1+incompatible
+	helm.sh/helm/v3 v3.1.0
+	k8s.io/apimachinery v0.17.2
+	k8s.io/helm v2.16.3+incompatible
 )
 
-replace github.com/docker/docker => github.com/docker/docker v0.0.0-20190731150326-928381b2215c
+replace (
+	github.com/Azure/go-autorest => github.com/Azure/go-autorest v13.3.2+incompatible
+	github.com/docker/distribution => github.com/docker/distribution v0.0.0-20191216044856-a8371794149d
+)

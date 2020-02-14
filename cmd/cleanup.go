@@ -25,6 +25,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/helm/helm-2to3/pkg/common"
+	utils "github.com/helm/helm-2to3/pkg/utils"
 	v2 "github.com/helm/helm-2to3/pkg/v2"
 )
 
@@ -68,21 +69,27 @@ func newCleanupCmd(out io.Writer) *cobra.Command {
 func runCleanup(cmd *cobra.Command, args []string) error {
 	cleanupOptions := CleanupOptions{
 		ConfigCleanup:    configCleanup,
-		DryRun:           settings.dryRun,
+		DryRun:           settings.DryRun,
 		ReleaseCleanup:   releaseCleanup,
-		StorageType:      settings.releaseStorage,
+		StorageType:      settings.ReleaseStorage,
 		TillerCleanup:    tillerCleanup,
-		TillerLabel:      settings.label,
-		TillerNamespace:  settings.tillerNamespace,
-		TillerOutCluster: settings.tillerOutCluster,
+		TillerLabel:      settings.Label,
+		TillerNamespace:  settings.TillerNamespace,
+		TillerOutCluster: settings.TillerOutCluster,
 	}
-	return Cleanup(cleanupOptions)
+
+	kubeConfig := common.KubeConfig{
+		Context: settings.KubeContext,
+		File:    settings.KubeConfigFile,
+	}
+
+	return Cleanup(cleanupOptions, kubeConfig)
 }
 
 // Cleanup will delete all release data for in specified namespace and owner label. It will remove
 // the Tiller server deployed as per namespace and owner label. It is also delete the Helm gv2 home directory
 // which contains the Helm configuration. Helm v2 will be unusable after this operation.
-func Cleanup(cleanupOptions CleanupOptions) error {
+func Cleanup(cleanupOptions CleanupOptions, kubeConfig common.KubeConfig) error {
 	var message strings.Builder
 
 	if !cleanupOptions.ConfigCleanup && !cleanupOptions.ReleaseCleanup && !cleanupOptions.TillerCleanup {
@@ -115,7 +122,7 @@ func Cleanup(cleanupOptions CleanupOptions) error {
 
 	fmt.Println(message.String())
 
-	doCleanup, err := common.AskConfirmation("Cleanup", "cleanup Helm v2 data")
+	doCleanup, err := utils.AskConfirmation("Cleanup", "cleanup Helm v2 data")
 	if err != nil {
 		return err
 	}
@@ -135,7 +142,7 @@ func Cleanup(cleanupOptions CleanupOptions) error {
 			TillerOutCluster: cleanupOptions.TillerOutCluster,
 			StorageType:      cleanupOptions.StorageType,
 		}
-		err = v2.DeleteAllReleaseVersions(retrieveOptions, cleanupOptions.DryRun)
+		err = v2.DeleteAllReleaseVersions(retrieveOptions, kubeConfig, cleanupOptions.DryRun)
 		if err != nil {
 			return err
 		}

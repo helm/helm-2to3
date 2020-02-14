@@ -23,7 +23,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/helm/helm-2to3/pkg/common"
+	utils "github.com/helm/helm-2to3/pkg/utils"
 )
 
 func newMoveConfigCmd(out io.Writer) *cobra.Command {
@@ -52,7 +52,7 @@ func runMove(cmd *cobra.Command, args []string) error {
 		return errors.New("config argument has to be specified")
 	}
 
-	return Move(settings.dryRun)
+	return Move(settings.DryRun)
 }
 
 // Moves/copies v2 configuration to v2 configuration. It copies repository config,
@@ -66,7 +66,7 @@ func Move(dryRun bool) error {
 
 	log.Println("WARNING: Helm v3 configuration maybe overwritten during this operation.")
 	log.Println()
-	doCleanup, err := common.AskConfirmation("Move Config", "move the v2 configration")
+	doCleanup, err := utils.AskConfirmation("Move Config", "move the v2 configration")
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func Move(dryRun bool) error {
 	}
 
 	log.Println("\nHelm v2 configuration will be moved to Helm v3 configration.")
-	err = common.Copyv2HomeTov3(dryRun)
+	err = utils.Copyv2HomeTov3(dryRun)
 	if err != nil {
 		return err
 	}
