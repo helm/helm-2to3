@@ -23,6 +23,8 @@ import (
 
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
+
+	common "github.com/helm/helm-2to3/pkg/common"
 )
 
 var (
@@ -30,8 +32,13 @@ var (
 )
 
 // GetActionConfig returns action configuration based on Helm env
-func GetActionConfig(namespace string) (*action.Configuration, error) {
+func GetActionConfig(namespace string, kubeConfig common.KubeConfig) (*action.Configuration, error) {
 	actionConfig := new(action.Configuration)
+
+	// Add kube config settings passed by user
+	settings.KubeConfig = kubeConfig.File
+	settings.KubeContext = kubeConfig.Context
+
 	err := actionConfig.Init(settings.RESTClientGetter(), namespace, os.Getenv("HELM_DRIVER"), debug)
 	if err != nil {
 		return nil, err

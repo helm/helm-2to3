@@ -32,6 +32,8 @@ import (
 	v2chrtutil "k8s.io/helm/pkg/chartutil"
 	v2chart "k8s.io/helm/pkg/proto/hapi/chart"
 	v2rls "k8s.io/helm/pkg/proto/hapi/release"
+
+	common "github.com/helm/helm-2to3/pkg/common"
 )
 
 // CreateRelease create a v3 release object from v3 release object
@@ -88,8 +90,8 @@ func CreateRelease(v2Rel *v2rls.Release) (*release.Release, error) {
 }
 
 // StoreRelease stores a release object in Helm v3 storage
-func StoreRelease(rel *release.Release) error {
-	cfg, err := GetActionConfig(rel.Namespace)
+func StoreRelease(rel *release.Release, kubeConfig common.KubeConfig) error {
+	cfg, err := GetActionConfig(rel.Namespace, kubeConfig)
 	if err != nil {
 		return err
 	}
