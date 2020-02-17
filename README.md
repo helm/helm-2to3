@@ -69,6 +69,14 @@ https://github.com/helm/helm-2to3/releases/download/v0.1.3/helm-2to3_0.1.3_darwi
 Installed plugin: 2to3
 ```
 
+### For Windows (using WSL)
+Helm's plugin install hook system relies on `/bin/sh`, regardless of the operating system present. Windows users can work around this by using Helm under [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
+```
+$ wget https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz
+$ tar xzf helm-v3.0.0-linux-amd64.tar.gz
+$ ./linux-amd64/helm plugin install https://github.com/helm/helm-2to3
+```
+
 ## Usage
 
 ### Migrate Helm v2 configuration
