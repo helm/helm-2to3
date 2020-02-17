@@ -77,11 +77,9 @@ Migrate Helm v2 configuration in-place to Helm v3:
 
 ```console
 $ helm 2to3 move config [flags]
-```
 
 Flags:
 
-```
       --dry-run  simulate a command
   -h, --help     help for move
 ```
@@ -118,19 +116,19 @@ Migrate Helm v2 releases in-place to Helm v3
 
 ```console
 $ helm 2to3 convert [flags] RELEASE
-```
 
 Flags:
 
-```
-      --dry-run                  simulate a command
-  -h, --help                     help for convert
-      --delete-v2-releases       v2 release versions are deleted after migration. By default, the v2 release versions are retained
-  -l, --label string             label to select Tiller resources by (default "OWNER=TILLER")
-  -s, --release-storage string   v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag (default "secrets")
-      --release-versions-max int limit the maximum number of versions converted per release. Use 0 for no limit (default 10)
-  -t, --tiller-ns string         namespace of Tiller (default "kube-system")
-      --tiller-out-cluster       when Tiller is not running in the cluster e.g. Tillerless
+      --delete-v2-releases         v2 release versions are deleted after migration. By default, the v2 release versions are retained
+      --dry-run                    simulate a command
+  -h, --help                       help for convert
+      --kube-context string        name of the kubeconfig context to use
+      --kubeconfig string          path to the kubeconfig file
+  -l, --label string               label to select Tiller resources by (default "OWNER=TILLER")
+  -s, --release-storage string     v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag (default "secrets")
+      --release-versions-max int   limit the maximum number of versions converted per release. Use 0 for no limit (default 10)
+  -t, --tiller-ns string           namespace of Tiller (default "kube-system")
+      --tiller-out-cluster         when  Tiller is not running in the cluster e.g. Tillerless
 ```
 
 **Note:** There is a limit set on the number of versions/revisions of a release that are converted. It is defaulted to 10 but can be configured with the `--release-versions-max` flag.
@@ -146,9 +144,12 @@ Clean up Helm v2 configuration, release data and Tiller deployment:
 $ helm 2to3 cleanup [flags]
 
 Flags:
+
       --config-cleanup           if set, configuration cleanup performed
       --dry-run                  simulate a command
   -h, --help                     help for cleanup
+      --kube-context string      name of the kubeconfig context to use
+      --kubeconfig string        path to the kubeconfig file
   -l, --label string             label to select Tiller resources by (default "OWNER=TILLER")
       --release-cleanup          if set, release data cleanup performed
   -s, --release-storage string   v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag (default "secrets")
