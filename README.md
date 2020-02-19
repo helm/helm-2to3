@@ -63,7 +63,7 @@ by the Helm v2 client instance. [Clean up](#clean-up-helm-v2-data) should only b
 Based on the version in `plugin.yaml`, release binary will be downloaded from GitHub:
 
 ```console
-$ helm plugin install https://github.com/helm/helm-2to3
+$ helm plugin install https://github.com/helm/helm-2to3.git
 Downloading and installing helm-2to3 v0.1.3 ...
 https://github.com/helm/helm-2to3/releases/download/v0.1.3/helm-2to3_0.1.3_darwin_amd64.tar.gz
 Installed plugin: 2to3
