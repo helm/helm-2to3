@@ -19,6 +19,7 @@ package cmd
 import (
 	"errors"
 	"io"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -44,6 +45,20 @@ func NewRootCmd(out io.Writer, args []string) *cobra.Command {
 	flags := cmd.PersistentFlags()
 	flags.Parse(args)
 	settings = new(EnvSettings)
+
+	// When run with the Helm plugin framework, Helm plugins are not passed the
+	// plugin flags that correspond to Helm global flags e.g. helm 2to3 convert --kube-context ...
+	// The flag values are set to corresponding environment variables instead.
+	// The flags are passed as expected when run directly using the binary.
+	// The below allows to use Helm's --kube-context global flag.
+	if ctx := os.Getenv("HELM_KUBECONTEXT"); ctx != "" {
+		settings.KubeContext = ctx
+	}
+
+	// Note that the plugin's --kubeconfig flag is set by the Helm plugin framework to
+	// the KUBECONFIG environment variable instead of being passed into the plugin.
+	// That variable is transparently handled by the helm-plugin-utils package so does not
+	// need to be explicitely handled here.
 
 	cmd.AddCommand(
 		newCleanupCmd(out),
