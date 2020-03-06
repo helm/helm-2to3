@@ -15,5 +15,6 @@ archive:
   files:
     - LICENSE
     - plugin.yaml
+    - completion.yaml
 checksum:
   name_template: 'checksums.txt'
