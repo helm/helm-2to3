@@ -13,8 +13,10 @@ builds:
 archive:
   format: tar.gz
   files:
+    - README.md
     - LICENSE
     - plugin.yaml
     - completion.yaml
+    - scripts/install_plugin.sh
 checksum:
   name_template: 'checksums.txt'
