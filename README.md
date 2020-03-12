@@ -159,7 +159,7 @@ Flags:
       --kube-context string      name of the kubeconfig context to use
       --kubeconfig string        path to the kubeconfig file
   -l, --label string             label to select Tiller resources by (default "OWNER=TILLER")
-  -n, --name string              the release name. When it is specified, the named release and its versions will be removed only. Should not be used with other cleanup operations
+      --name string              the release name. When it is specified, the named release and its versions will be removed only. Should not be used with other cleanup operations
       --release-cleanup          if set, release data cleanup performed
   -s, --release-storage string   v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag (default "secrets")
       --tiller-cleanup           if set, Tiller cleanup performed

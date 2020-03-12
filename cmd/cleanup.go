@@ -63,7 +63,7 @@ func newCleanupCmd(out io.Writer) *cobra.Command {
 	settings.AddFlags(flags)
 
 	flags.BoolVar(&configCleanup, "config-cleanup", false, "if set, configuration cleanup performed")
-	flags.StringVarP(&releaseName, "name", "n", "", "the release name. When it is specified, the named release and its versions will be removed only. Should not be used with other cleanup operations")
+	flags.StringVar(&releaseName, "name", "", "the release name. When it is specified, the named release and its versions will be removed only. Should not be used with other cleanup operations")
 	flags.BoolVar(&releaseCleanup, "release-cleanup", false, "if set, release data cleanup performed")
 	flags.BoolVar(&tillerCleanup, "tiller-cleanup", false, "if set, Tiller cleanup performed")
 
@@ -121,10 +121,14 @@ func Cleanup(cleanupOptions CleanupOptions, kubeConfig common.KubeConfig) error 
 		fmt.Fprint(&message, "\"Helm v2 Configuration\" ")
 	}
 	if cleanupOptions.ReleaseCleanup {
-		fmt.Fprint(&message, "\"Release Data\" ")
+		if cleanupOptions.ReleaseName == "" {
+			fmt.Fprint(&message, "\"Release Data\" ")
+		} else {
+			fmt.Fprint(&message, fmt.Sprintf("\"Release '%s' Data\" ", cleanupOptions.ReleaseName))
+		}
 	}
 	if cleanupOptions.TillerCleanup {
-		fmt.Fprint(&message, "\"Release Data\" ")
+		fmt.Fprint(&message, "\"Tiller\" ")
 	}
 	fmt.Fprintln(&message, "will be removed. ")
 	if cleanupOptions.ReleaseCleanup && cleanupOptions.ReleaseName == "" {
