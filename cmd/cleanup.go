@@ -17,6 +17,7 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -31,6 +32,7 @@ import (
 
 var (
 	configCleanup  bool
+	releaseName    string
 	releaseCleanup bool
 	tillerCleanup  bool
 )
@@ -38,6 +40,7 @@ var (
 type CleanupOptions struct {
 	ConfigCleanup    bool
 	DryRun           bool
+	ReleaseName      string
 	ReleaseCleanup   bool
 	StorageType      string
 	TillerCleanup    bool
@@ -60,6 +63,7 @@ func newCleanupCmd(out io.Writer) *cobra.Command {
 	settings.AddFlags(flags)
 
 	flags.BoolVar(&configCleanup, "config-cleanup", false, "if set, configuration cleanup performed")
+	flags.StringVar(&releaseName, "name", "", "the release name. When it is specified, the named release and its versions will be removed only. Should not be used with other cleanup operations")
 	flags.BoolVar(&releaseCleanup, "release-cleanup", false, "if set, release data cleanup performed")
 	flags.BoolVar(&tillerCleanup, "tiller-cleanup", false, "if set, Tiller cleanup performed")
 
@@ -71,6 +75,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 		ConfigCleanup:    configCleanup,
 		DryRun:           settings.DryRun,
 		ReleaseCleanup:   releaseCleanup,
+		ReleaseName:      releaseName,
 		StorageType:      settings.ReleaseStorage,
 		TillerCleanup:    tillerCleanup,
 		TillerLabel:      settings.Label,
@@ -92,10 +97,17 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 func Cleanup(cleanupOptions CleanupOptions, kubeConfig common.KubeConfig) error {
 	var message strings.Builder
 
-	if !cleanupOptions.ConfigCleanup && !cleanupOptions.ReleaseCleanup && !cleanupOptions.TillerCleanup {
-		cleanupOptions.ConfigCleanup = true
+	if cleanupOptions.ReleaseName != "" {
+		if cleanupOptions.ConfigCleanup || cleanupOptions.TillerCleanup {
+			return errors.New("cleanup of a specific release is a singular operation. Other operations like configuration cleanup or Tiller cleanup are not allowed in conjunction with the operation")
+		}
 		cleanupOptions.ReleaseCleanup = true
-		cleanupOptions.TillerCleanup = true
+	} else {
+		if !cleanupOptions.ConfigCleanup && !cleanupOptions.ReleaseCleanup && !cleanupOptions.TillerCleanup {
+			cleanupOptions.ConfigCleanup = true
+			cleanupOptions.ReleaseCleanup = true
+			cleanupOptions.TillerCleanup = true
+		}
 	}
 
 	if cleanupOptions.DryRun {
@@ -109,16 +121,22 @@ func Cleanup(cleanupOptions CleanupOptions, kubeConfig common.KubeConfig) error 
 		fmt.Fprint(&message, "\"Helm v2 Configuration\" ")
 	}
 	if cleanupOptions.ReleaseCleanup {
-		fmt.Fprint(&message, "\"Release Data\" ")
+		if cleanupOptions.ReleaseName == "" {
+			fmt.Fprint(&message, "\"Release Data\" ")
+		} else {
+			fmt.Fprint(&message, fmt.Sprintf("\"Release '%s' Data\" ", cleanupOptions.ReleaseName))
+		}
 	}
 	if cleanupOptions.TillerCleanup {
-		fmt.Fprint(&message, "\"Release Data\" ")
+		fmt.Fprint(&message, "\"Tiller\" ")
 	}
 	fmt.Fprintln(&message, "will be removed. ")
-	if cleanupOptions.ReleaseCleanup {
+	if cleanupOptions.ReleaseCleanup && cleanupOptions.ReleaseName == "" {
 		fmt.Fprintln(&message, "This will clean up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.")
 	}
-	fmt.Fprintln(&message, "Helm v2 may not be usable afterwards.")
+	if cleanupOptions.ReleaseName == "" {
+		fmt.Fprintln(&message, "Helm v2 may not be usable afterwards.")
+	}
 
 	fmt.Println(message.String())
 
@@ -134,20 +152,47 @@ func Cleanup(cleanupOptions CleanupOptions, kubeConfig common.KubeConfig) error 
 	log.Printf("\nHelm v2 data will be cleaned up.\n")
 
 	if cleanupOptions.ReleaseCleanup {
-		log.Println("[Helm 2] Releases will be deleted.")
+		if cleanupOptions.ReleaseName == "" {
+			log.Println("[Helm 2] Releases will be deleted.")
+		} else {
+			log.Printf("[Helm 2] Release '%s' will be deleted.\n", cleanupOptions.ReleaseName)
+		}
 		retrieveOptions := v2.RetrieveOptions{
-			ReleaseName:      "",
+			ReleaseName:      cleanupOptions.ReleaseName,
 			TillerNamespace:  cleanupOptions.TillerNamespace,
 			TillerLabel:      cleanupOptions.TillerLabel,
 			TillerOutCluster: cleanupOptions.TillerOutCluster,
 			StorageType:      cleanupOptions.StorageType,
 		}
-		err = v2.DeleteAllReleaseVersions(retrieveOptions, kubeConfig, cleanupOptions.DryRun)
+		if cleanupOptions.ReleaseName == "" {
+			err = v2.DeleteAllReleaseVersions(retrieveOptions, kubeConfig, cleanupOptions.DryRun)
+		} else {
+			// Get the releases versions as its the versions that are deleted
+			v2Releases, err := v2.GetReleaseVersions(retrieveOptions, kubeConfig)
+			if err != nil {
+				return err
+			}
+			versions := []int32{}
+			v2RelVerLen := len(v2Releases)
+			for i := 0; i < v2RelVerLen; i++ {
+				v2Release := v2Releases[i]
+				versions = append(versions, v2Release.Version)
+			}
+			deleteOptions := v2.DeleteOptions{
+				DryRun:   cleanupOptions.DryRun,
+				Versions: versions,
+			}
+			err = v2.DeleteReleaseVersions(retrieveOptions, deleteOptions, kubeConfig)
+		}
 		if err != nil {
 			return err
 		}
 		if !cleanupOptions.DryRun {
-			log.Println("[Helm 2] Releases deleted.")
+			if cleanupOptions.ReleaseName == "" {
+				log.Println("[Helm 2] Releases deleted.")
+			} else {
+				log.Printf("[Helm 2] Release '%s' deleted.\n", cleanupOptions.ReleaseName)
+			}
 		}
 	}
 

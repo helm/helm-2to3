@@ -5,6 +5,7 @@ commands:
   - dry-run
   - l
   - label
+  - name
   - release-cleanup
   - s
   - release-storage

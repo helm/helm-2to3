@@ -159,6 +159,7 @@ Flags:
       --kube-context string      name of the kubeconfig context to use
       --kubeconfig string        path to the kubeconfig file
   -l, --label string             label to select Tiller resources by (default "OWNER=TILLER")
+      --name string              the release name. When it is specified, the named release and its versions will be removed only. Should not be used with other cleanup operations
       --release-cleanup          if set, release data cleanup performed
   -s, --release-storage string   v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag (default "secrets")
       --tiller-cleanup           if set, Tiller cleanup performed
@@ -172,6 +173,7 @@ It will clean:
 - Tiller deployment
 
 Clean up can be done individually also, by setting one or all of the following flags: `--config-cleanup`, `--release-cleanup` and `--tiller-cleanup`.
+Cleanup of a release and its versions is done by setting `--name` flag. This is a singular operation and is not to be used with the other cleanup operations.
 If none of these flag are set, then all cleanup is performed.
 
 For cleanup it uses the default Helm v2 home folder.
