@@ -61,10 +61,11 @@ func CreateRelease(v2Rel *v2rls.Release) (*release.Release, error) {
 	if err != nil {
 		return nil, err
 	}
-	status, ok := v2rls.Status_Code_name[int32(v2Rel.Info.Status.Code)]
-	if !ok {
-		return nil, fmt.Errorf("Failed to convert status")
+	v3StatusStr, err := mapStatus(v2Rel.Info)
+	if err != nil {
+		return nil, err
 	}
+
 	hooks, err := mapHooks(v2Rel.Hooks, v2Rel.Info.Status.LastTestSuiteRun)
 	if err != nil {
 		return nil, err
@@ -80,7 +81,7 @@ func CreateRelease(v2Rel *v2rls.Release) (*release.Release, error) {
 			LastDeployed:  last,
 			Description:   v2Rel.Info.Description,
 			Deleted:       deleted,
-			Status:        release.Status(strings.ToLower(status)),
+			Status:        release.Status(v3StatusStr),
 			Notes:         v2Rel.Info.Status.Notes,
 		},
 		Manifest: v2Rel.Manifest,
@@ -139,7 +140,7 @@ func mapMetadata(v2Chrt *v2chart.Chart) *chart.Metadata {
 	metadata.Deprecated = v2Chrt.Metadata.Deprecated
 	metadata.Annotations = v2Chrt.Metadata.Annotations
 	metadata.KubeVersion = v2Chrt.Metadata.KubeVersion
-	// v2 does not save the dependency metadat from requirements, so setting to nil
+	// v2 does not save the dependency metadata from requirements, so setting to nil
 	// v3 should gather data as need be from the chart dependencies
 	metadata.Dependencies = nil
 	//Default to application
@@ -215,6 +216,23 @@ func mapFiles(v2Files []*any.Any) []*chart.File {
 	return files
 }
 
+func mapStatus(v2Info *v2rls.Info) (string, error) {
+	v2StatusStr, ok := v2rls.Status_Code_name[int32(v2Info.Status.Code)]
+	if !ok {
+		return "", fmt.Errorf("Failed to get v2 status")
+	}
+	// map to v3 status
+	lowerCaseStr := strings.ToLower(v2StatusStr)
+	v3StatusStr := strings.ReplaceAll(lowerCaseStr, "_", "-")
+	if v3StatusStr == "deleted" {
+		v3StatusStr = "uninstalled"
+	}
+	if v3StatusStr == "deleting" {
+		v3StatusStr = "uninstalling"
+	}
+	return v3StatusStr, nil
+}
+
 func mapHooks(v2Hooks []*v2rls.Hook, v2LastTestSuiteRun *v2rls.TestSuite) ([]*release.Hook, error) {
 	if v2Hooks == nil {
 		return nil, nil
@@ -261,9 +279,17 @@ func mapHookEvents(v2HookEvents []v2rls.Hook_Event) ([]release.HookEvent, error)
 	for _, val := range v2HookEvents {
 		v2EventStr, ok := v2rls.Hook_Event_name[int32(val)]
 		if !ok {
-			return nil, fmt.Errorf("Failed to convert hook event")
+			return nil, fmt.Errorf("Failed to get the v2 hook event string")
 		}
-		event := release.HookEvent(strings.ToLower(v2EventStr))
+
+		// map to v3 hook event
+		lowerCaseStr := strings.ToLower(v2EventStr)
+		v3EventStr := strings.ReplaceAll(lowerCaseStr, "_", "-")
+		if strings.Contains(v3EventStr, "release-test") {
+			v3EventStr = "test"
+		}
+
+		event := release.HookEvent(v3EventStr)
 		hookEvents = append(hookEvents, event)
 	}
 	return hookEvents, nil
@@ -277,9 +303,17 @@ func mapHookDeletePolicies(v2HookDelPolicies []v2rls.Hook_DeletePolicy) ([]relea
 	for _, val := range v2HookDelPolicies {
 		v2PolicyStr, ok := v2rls.Hook_DeletePolicy_name[int32(val)]
 		if !ok {
-			return nil, fmt.Errorf("Failed to convert hook delete policy")
+			return nil, fmt.Errorf("Failed to get the v2 hook delete policy")
 		}
-		policy := release.HookDeletePolicy(strings.ToLower(v2PolicyStr))
+
+		// map to v3 hook delete policy
+		lowerCaseStr := strings.ToLower(v2PolicyStr)
+		v3PolicyStr := strings.ReplaceAll(lowerCaseStr, "_", "-")
+		if !strings.Contains(v3PolicyStr, "before-hook-creation") {
+			v3PolicyStr = "hook-" + v3PolicyStr
+		}
+
+		policy := release.HookDeletePolicy(strings.ToLower(v3PolicyStr))
 		hookDelPolicies = append(hookDelPolicies, policy)
 	}
 	return hookDelPolicies, nil
@@ -325,9 +359,19 @@ func mapTestSuiteToHookExecution(hookName string, testSuite *v2rls.TestSuite) (*
 		}
 		v2RunStatusStr, ok := v2rls.TestRun_Status_name[int32(testRun.Status)]
 		if !ok {
-			return nil, fmt.Errorf("Failed to convert test run status")
+			return nil, fmt.Errorf("Failed to get the v2 test run status")
 		}
-		hookEx.Phase = release.HookPhase(strings.Title((strings.ToLower(v2RunStatusStr))))
+
+		// Map to v3 test run status
+		v3RunStatusStr := strings.ToLower(v2RunStatusStr)
+		if v3RunStatusStr == "success" {
+			v3RunStatusStr = "Succeeded"
+		}
+		if v3RunStatusStr == "failure" {
+			v3RunStatusStr = "Failed"
+		}
+
+		hookEx.Phase = release.HookPhase(strings.Title(v3RunStatusStr))
 		return hookEx, nil
 	}
 
