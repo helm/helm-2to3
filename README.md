@@ -238,6 +238,7 @@ $ cd $_
 $ git clone git@github.com:helm/helm-2to3.git
 $ cd helm-2to3
 $ make build
+$ export HELM_LINTER_PLUGIN_NO_INSTALL_HOOK=true
 $ helm plugin install <your_path>/helm-2to3
 ```
 
