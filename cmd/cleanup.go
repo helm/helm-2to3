@@ -31,10 +31,11 @@ import (
 )
 
 var (
-	configCleanup  bool
-	releaseName    string
-	releaseCleanup bool
-	tillerCleanup  bool
+	configCleanup    bool
+	releaseName      string
+	releaseCleanup   bool
+	skipConfirmation bool
+	tillerCleanup    bool
 )
 
 type CleanupOptions struct {
@@ -42,6 +43,7 @@ type CleanupOptions struct {
 	DryRun           bool
 	ReleaseName      string
 	ReleaseCleanup   bool
+	SkipConfirmation bool
 	StorageType      string
 	TillerCleanup    bool
 	TillerLabel      string
@@ -65,6 +67,7 @@ func newCleanupCmd(out io.Writer) *cobra.Command {
 	flags.BoolVar(&configCleanup, "config-cleanup", false, "if set, configuration cleanup performed")
 	flags.StringVar(&releaseName, "name", "", "the release name. When it is specified, the named release and its versions will be removed only. Should not be used with other cleanup operations")
 	flags.BoolVar(&releaseCleanup, "release-cleanup", false, "if set, release data cleanup performed")
+	flags.BoolVar(&skipConfirmation, "skip-confirmation", false, "if set, skips confirmation message before performing cleanup")
 	flags.BoolVar(&tillerCleanup, "tiller-cleanup", false, "if set, Tiller cleanup performed")
 
 	return cmd
@@ -76,6 +79,7 @@ func runCleanup(cmd *cobra.Command, args []string) error {
 		DryRun:           settings.DryRun,
 		ReleaseCleanup:   releaseCleanup,
 		ReleaseName:      releaseName,
+		SkipConfirmation: skipConfirmation,
 		StorageType:      settings.ReleaseStorage,
 		TillerCleanup:    tillerCleanup,
 		TillerLabel:      settings.Label,
@@ -140,7 +144,15 @@ func Cleanup(cleanupOptions CleanupOptions, kubeConfig common.KubeConfig) error 
 
 	fmt.Println(message.String())
 
-	doCleanup, err := utils.AskConfirmation("Cleanup", "cleanup Helm v2 data")
+	var doCleanup bool
+	var err error
+	if cleanupOptions.SkipConfirmation {
+		log.Println("Skipping confirmation before performing cleanup.")
+		doCleanup = true
+		err = nil
+	} else {
+		doCleanup, err = utils.AskConfirmation("Cleanup", "cleanup Helm v2 data")
+	}
 	if err != nil {
 		return err
 	}
