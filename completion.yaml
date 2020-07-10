@@ -9,6 +9,7 @@ commands:
   - release-cleanup
   - s
   - release-storage
+  - skip-confirmation
   - tiller-cleanup
   - t
   - tiller-ns
