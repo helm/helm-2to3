@@ -41,6 +41,7 @@ func newMoveConfigCmd(out io.Writer) *cobra.Command {
 
 	flags := cmd.Flags()
 	settings.AddBaseFlags(flags)
+	flags.BoolVar(&skipConfirmation, "skip-confirmation", false, "if set, skips confirmation message before performing move")
 
 	return cmd
 }
@@ -57,6 +58,10 @@ func runMove(cmd *cobra.Command, args []string) error {
 
 // Moves/copies v2 configuration to v2 configuration. It copies repository config,
 // plugins and starters. It does not copy cache.
+
+var err error
+var doCleanup bool
+
 func Move(dryRun bool) error {
 	if dryRun {
 		log.Println("NOTE: This is in dry-run mode, the following actions will not be executed.")
@@ -66,12 +71,17 @@ func Move(dryRun bool) error {
 
 	log.Println("WARNING: Helm v3 configuration may be overwritten during this operation.")
 	log.Println()
-	doCleanup, err := utils.AskConfirmation("Move Config", "move the v2 configuration")
+	if skipConfirmation {
+		log.Println("Skipping confirmation before performing move.")
+		doCleanup = true
+	} else {
+		doCleanup, err = utils.AskConfirmation("Move Config", "move the v2 configuration")
+	}
 	if err != nil {
 		return err
 	}
 	if !doCleanup {
-		log.Println("Move configuration will not proceed as the user didn't answer (Y|y) in order to continue.")
+		log.Println("Move will not proceed as the user didn't answer (Y|y) in order to continue.")
 		return nil
 	}
 
