@@ -36,6 +36,7 @@ func New() *EnvSettings {
 // AddBaseFlags binds base flags to the given flagset.
 func (s *EnvSettings) AddBaseFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&s.DryRun, "dry-run", false, "simulate a command")
+	
 }
 
 // AddFlags binds flags to the given flagset.
