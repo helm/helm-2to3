@@ -40,7 +40,7 @@ func newMoveConfigCmd(out io.Writer) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	settings.AddFlags(flags)
+	settings.AddBaseFlags(flags)
 	flags.BoolVar(&skipConfirmation, "skip-confirmation", false, "if set, skips confirmation message before performing move")
 
 	return cmd
@@ -74,7 +74,6 @@ func Move(dryRun bool) error {
 	if skipConfirmation {
 		log.Println("Skipping confirmation before performing move.")
 		doCleanup = true
-		err = nil
 	} else {
 		doCleanup, err = utils.AskConfirmation("Move Config", "move the v2 configuration")
 	}
