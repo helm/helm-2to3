@@ -31,3 +31,4 @@ commands:
   - name: config
     flags:
     - dry-run
+    - skip-confirmation
