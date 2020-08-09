@@ -55,12 +55,11 @@ func runMove(cmd *cobra.Command, args []string) error {
 	return Move(settings.DryRun)
 }
 
-var err error
-var doCleanup bool
-
 // Moves/copies v2 configuration to v2 configuration. It copies repository config,
 // plugins and starters. It does not copy cache.
 func Move(dryRun bool) error {
+	var err error
+	var doCleanup bool
 	if dryRun {
 		log.Println("NOTE: This is in dry-run mode, the following actions will not be executed.")
 		log.Println("Run without --dry-run to take the actions described below:")
@@ -70,10 +69,14 @@ func Move(dryRun bool) error {
 	log.Println("WARNING: Helm v3 configuration may be overwritten during this operation.")
 	log.Println()
 	if skipConfirmation {
+
 		log.Println("Skipping confirmation before performing move.")
 		doCleanup = true
 	} else {
 		doCleanup, err = utils.AskConfirmation("Move Config", "move the v2 configuration")
+		if err != nil {
+			return err
+		}
 	}
 	if !doCleanup {
 		log.Println("Move will not proceed as the user didn't answer (Y|y) in order to continue.")
