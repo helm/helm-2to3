@@ -17,6 +17,7 @@ limitations under the License.
 package v2
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sort"
@@ -45,9 +46,11 @@ type DeleteOptions struct {
 // ByReleaseVersion implements sort.Interface based on the rls.Release Version field
 type ByReleaseVersion []*rls.Release
 
-func (releases ByReleaseVersion) Len() int           { return len(releases) }
-func (releases ByReleaseVersion) Less(i, j int) bool { return releases[i].Version < releases[j].Version }
-func (releases ByReleaseVersion) Swap(i, j int)      { releases[i], releases[j] = releases[j], releases[i] }
+func (releases ByReleaseVersion) Len() int { return len(releases) }
+func (releases ByReleaseVersion) Less(i, j int) bool {
+	return releases[i].Version < releases[j].Version
+}
+func (releases ByReleaseVersion) Swap(i, j int) { releases[i], releases[j] = releases[j], releases[i] }
 
 // GetReleaseVersions returns all release versions from Helm v2 storage for a specified release..
 // It is based on Tiller namespace and labels like owner of storage.
@@ -138,7 +141,7 @@ func getReleases(retOpts RetrieveOptions, kubeConfig common.KubeConfig) ([]*rls.
 	var releases []*rls.Release
 	switch storage {
 	case "secrets":
-		secrets, err := clientSet.CoreV1().Secrets(retOpts.TillerNamespace).List(metav1.ListOptions{
+		secrets, err := clientSet.CoreV1().Secrets(retOpts.TillerNamespace).List(context.Background(), metav1.ListOptions{
 			LabelSelector: retOpts.TillerLabel,
 		})
 		if err != nil {
@@ -152,7 +155,7 @@ func getReleases(retOpts RetrieveOptions, kubeConfig common.KubeConfig) ([]*rls.
 			releases = append(releases, release)
 		}
 	case "configmaps":
-		configMaps, err := clientSet.CoreV1().ConfigMaps(retOpts.TillerNamespace).List(metav1.ListOptions{
+		configMaps, err := clientSet.CoreV1().ConfigMaps(retOpts.TillerNamespace).List(context.Background(), metav1.ListOptions{
 			LabelSelector: retOpts.TillerLabel,
 		})
 		if err != nil {
@@ -198,9 +201,9 @@ func deleteRelease(retOpts RetrieveOptions, releaseVersionName string, kubeConfi
 	clientSet := utils.GetClientSetWithKubeConfig(kubeConfig.File, kubeConfig.Context)
 	switch storage {
 	case "secrets":
-		return clientSet.CoreV1().Secrets(retOpts.TillerNamespace).Delete(releaseVersionName, &metav1.DeleteOptions{})
+		return clientSet.CoreV1().Secrets(retOpts.TillerNamespace).Delete(context.Background(), releaseVersionName, metav1.DeleteOptions{})
 	case "configmaps":
-		return clientSet.CoreV1().ConfigMaps(retOpts.TillerNamespace).Delete(releaseVersionName, &metav1.DeleteOptions{})
+		return clientSet.CoreV1().ConfigMaps(retOpts.TillerNamespace).Delete(context.Background(), releaseVersionName, metav1.DeleteOptions{})
 	}
 	return nil
 }
