@@ -56,7 +56,7 @@ by the Helm v2 client instance. [Clean up](#clean-up-helm-v2-data) should only b
 - Helm v3 client with `2to3` plugin installed on the same system
 - Access to the cluster(s) that Helm v2 client is managing and which Helm v3 will manage after migration. This access is similar to `kubectl` access using [kubeconfig files](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/).
   The `--kubeconfig` and `--kube-context` flags can be used with the `convert` and `cleanup` commands to set the kubeconfig path and context to override the environment configuration.
-- Access to the `tiller` namespace for required RBAC roles. If `Tillerless` setup, then a service account with the proper cluster wide RBAC roles will need to be used. If not used, `forbidden` errors will be thrown when trying to access restricted resources. 
+- Access to the `tiller` namespace for required RBAC roles. If `Tillerless` setup, then a service account with the proper cluster wide RBAC roles will need to be used. If not used, `forbidden` errors will be thrown when trying to access restricted resources.
 
 ## Install
 
@@ -141,7 +141,7 @@ Flags:
 
 **Note:** There is a limit set on the number of versions/revisions of a release that are converted. It is defaulted to 10 but can be configured with the `--release-versions-max` flag.
 When the limit set is less that the actual number of versions then only the latest release versions up to the limit will be converted. Older release versions with not be converted.
-If `--delete-v2-releases ` is set, thes older versions will remain in Helm v2 storage but will no longer be visible to Helm v2 commands like `helm list`. [Clean up](#clean-up-helm-v2-data)
+If `--delete-v2-releases ` is set, these older versions will remain in Helm v2 storage but will no longer be visible to Helm v2 commands like `helm list`. [Clean up](#clean-up-helm-v2-data)
 will remove them from storage.
 
 ### Clean up Helm v2 data
@@ -162,6 +162,7 @@ Flags:
       --name string              the release name. When it is specified, the named release and its versions will be removed only. Should not be used with other cleanup operations
       --release-cleanup          if set, release data cleanup performed
   -s, --release-storage string   v2 release storage type/object. It can be 'secrets' or 'configmaps'. This is only used with the 'tiller-out-cluster' flag (default "secrets")
+      --skip-confirmation        if set, skips confirmation message before performing cleanup
       --tiller-cleanup           if set, Tiller cleanup performed
   -t, --tiller-ns string         namespace of Tiller (default "kube-system")
       --tiller-out-cluster       when  Tiller is not running in the cluster e.g. Tillerless
@@ -215,7 +216,7 @@ repository list afterwards: `<helm3> repo update`. You should then be able to ru
 A. You can perform batch migration of releases using a command as follows:
 
 ```console
-$ kubectl get [configmap|secret] -n <tiller_namespace> \ 
+$ kubectl get [configmap|secret] -n <tiller_namespace> \
  -l "OWNER=TILLER" | awk '{print $1}' | grep -v NAME | cut -d '.' -f1 | uniq | xargs -n1 helm 2to3 convert
 ```
 
