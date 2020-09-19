@@ -70,10 +70,10 @@ func Move(dryRun bool) error {
 	log.Println()
 	if skipConfirmation {
 
-		log.Println("Skipping confirmation before performing move.")
+		log.Println("Skipping confirmation before performing move configuration.")
 		doConfig = true
 	} else {
-		doConfig, err = utils.AskConfirmation("Move Config", "move the v2 configuration")
+		doConfig, err = utils.AskConfirmation("Move config", "move the v2 configuration")
 		if err != nil {
 			return err
 		}
