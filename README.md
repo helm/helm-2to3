@@ -89,6 +89,7 @@ $ helm 2to3 move config [flags]
 Flags:
 
       --dry-run  simulate a command
+      --skip-confirmation   if set, skips confirmation message before performing move
   -h, --help     help for move
 ```
 
