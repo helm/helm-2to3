@@ -14,6 +14,7 @@
 One of the most important aspects of upgrading to a new major release of Helm is the
 migration of data. This is especially true of Helm v2 to v3 considering the architectural
 changes between the releases. The `2to3` plugin helps with this migration by supporting:
+
 - Migration of [Helm v2 configuration](#migrate-helm-v2-configuration).
 - Migration of [Helm v2 releases](#migrate-helm-v2-releases).
 - [Clean up](#clean-up-helm-v2-data) Helm v2 configuration, release data and Tiller deployment.
@@ -25,6 +26,7 @@ You should be aware of any risks specific to your environment and prepare a data
 strategy for your needs.
 
 Here are some suggestions to mitigate against potential risks during migration:
+
 - Perform a data backup of the following:
   - Helm v2 home folder.
   - Release data from the cluster. Refer to [How Helm Uses ConfigMaps to Store Data](http://technosophos.com/2017/03/23/how-helm-uses-configmaps-to-store-data.html)
@@ -43,6 +45,7 @@ Here are some suggestions to mitigate against potential risks during migration:
 
 **Note:**
 A Helm v2 client:
+
 - can manage 1 to many Kubernetes clusters.
 - can connect to 1 to many Tiller instances for  a cluster.
 
@@ -70,8 +73,10 @@ Installed plugin: 2to3
 ```
 
 ### For Windows (using WSL)
+
 Helm's plugin install hook system relies on `/bin/sh`, regardless of the operating system present. Windows users can work around this by using Helm under [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10).
-```
+
+```console
 $ wget https://get.helm.sh/helm-v3.0.0-linux-amd64.tar.gz
 $ tar xzf helm-v3.0.0-linux-amd64.tar.gz
 $ ./linux-amd64/helm plugin install https://github.com/helm/helm-2to3
@@ -94,11 +99,13 @@ Flags:
 ```
 
 It will migrate:
+
 - Chart starters
 - Repositories
 - Plugins
 
 **Note:**
+
 - The `move config` command will create the Helm v3 config and data folders if they don't exist, and will override the `repositories.yaml` file if it does exist.
 - For migration it uses default Helm v2 home and v3 config and data folders. To override those folders you need to set environment variables
 `HELM_V2_HOME`, `HELM_V3_CONFIG` and `HELM_V3_DATA`:
@@ -142,7 +149,7 @@ Flags:
 
 **Note:** There is a limit set on the number of versions/revisions of a release that are converted. It is defaulted to 10 but can be configured with the `--release-versions-max` flag.
 When the limit set is less that the actual number of versions then only the latest release versions up to the limit will be converted. Older release versions with not be converted.
-If `--delete-v2-releases ` is set, these older versions will remain in Helm v2 storage but will no longer be visible to Helm v2 commands like `helm list`. [Clean up](#clean-up-helm-v2-data)
+If `--delete-v2-releases` is set, these older versions will remain in Helm v2 storage but will no longer be visible to Helm v2 commands like `helm list`. [Clean up](#clean-up-helm-v2-data)
 will remove them from storage.
 
 ### Clean up Helm v2 data
@@ -169,16 +176,24 @@ Flags:
       --tiller-out-cluster       when  Tiller is not running in the cluster e.g. Tillerless
 ```
 
-It will clean:
+A full clean will remove the:
+
 - Configuration (Helm home directory)
 - v2 release data
 - Tiller deployment
 
-Clean up can be done individually also, by setting one or all of the following flags: `--config-cleanup`, `--release-cleanup` and `--tiller-cleanup`.
-Cleanup of a release and its versions is done by setting `--name` flag. This is a singular operation and is not to be used with the other cleanup operations.
-If none of these flag are set, then all cleanup is performed.
+**Note:** Before performing a full or release data clean, remove any Helm v2 releases which have not been migrated to Helm v3 and are unwanted. They can be removed using the Helm v2 `delete` command. If they are not removed before clean up of the v2 release data then the Kubernetes resources deployed by the Helm release will remain in your cluster. In other words, the resources will be 'orphaned' without any Helm release associated.
 
-For cleanup it uses the default Helm v2 home folder.
+Cleanup of individual parts can be performed using the following flags:
+
+- `--config-cleanup` for configuration
+- `--release-cleanup` for v2 release data
+- `--tiller-cleanup` for Tiller deployment
+- `--name` for a release and its versions. This is a singular operation and is not to be used with the other cleanup operations.
+
+If none of these flags are set, then full cleanup is performed.
+
+The cleanup uses the default Helm v2 home folder.
 To override this folder you need to set the environment variable `HELM_V2_HOME`:
 
 ```console
@@ -186,9 +201,10 @@ $ export HELM_V2_HOME=$PWD/.helm2
 $ helm 2to3 cleanup
 ```
 
-**Warning:** The `cleanup` command will remove the Helm v2 Configuration, Release Data and Tiller Deployment.
+**Warning:** The full `cleanup`  command will remove the Helm v2 Configuration, Release Data and Tiller Deployment.
 It cleans up all releases managed by Helm v2. It will not be possible to restore them if you haven't made a backup of the releases.
-Helm v2 will not be usable afterwards. Cleanup should only be run once all migration (clusters and Tiller instances) for a Helm v2 client instance is complete.
+Helm v2 will not be usable afterwards. Full cleanup  should only be run once all migration (clusters and Tiller instances) for a Helm v2 client instance is complete.
+Helm v2 may also become unusable depending on cleanup of individual parts.
 
 ## Troubleshooting
 
@@ -200,7 +216,7 @@ Error might be similar to the following:
 $ helm dep update chrt-1/
 Hang tight while we grab the latest from your chart repositories...
 ...Unable to get an update from the "local" chart repository (http://127.0.0.1:8879/charts):
-	Get http://127.0.0.1:8879/charts/index.yaml: dial tcp 127.0.0.1:8879: connect: connection refused
+Get http://127.0.0.1:8879/charts/index.yaml: dial tcp 127.0.0.1:8879: connect: connection refused
 ...Successfully got an update from the "stable" chart repository
 Update Complete. ⎈Happy Helming!⎈
 Error: open /home/usr1/.cache/helm/repository/local-index.yaml: no such file or directory
@@ -209,6 +225,17 @@ Error: open /home/usr1/.cache/helm/repository/local-index.yaml: no such file or 
 A. Local respoitories are not copied to Helm v3. You therefore need to remove all local repositories from Helm v3 using `<helm3> repo remove` and re-add where
 required using `<helm3> repo add`. This is a necessary refresh to align references for Helm v3 and remove the conflict. It is worthwhile to also refresh the
 repository list afterwards: `<helm3> repo update`. You should then be able to run the chart dependency update command successfully.
+
+***Q. I get an error when I try to do a helm upgrade in Helm v3 after migration***
+
+Error might be similar to the following:
+
+```console
+$ helm upgrade nginx bitnami/nginx
+Error: failed to download "bitnami/nginx" (hint: running `helm repo update` may help)
+```
+
+A. This can happen when there are conflicts in the local repository list that Helm v3 cannot resolve. This can be fixed by running the `helm repo update` command.
 
 ## Frequently Asked Questions
 
