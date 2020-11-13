@@ -61,6 +61,15 @@ by the Helm v2 client instance. [Clean up](#clean-up-helm-v2-data) should only b
   The `--kubeconfig` and `--kube-context` flags can be used with the `convert` and `cleanup` commands to set the kubeconfig path and context to override the environment configuration.
 - Access to the `tiller` namespace for required RBAC roles. If `Tillerless` setup, then a service account with the proper cluster wide RBAC roles will need to be used. If not used, `forbidden` errors will be thrown when trying to access restricted resources.
 
+## Recommended Prior to Migration
+
+This is a list of recommendations prior to migration:
+
+- [Latest](https://github.com/helm/helm/releases/tag/v2.17.0) Helm v2 version.
+- [Latest](https://github.com/helm/helm/releases) Helm v3 version.
+- Update Helm v2 releases to supported Kubernetes APIs prior to migrating. Check out [Deprecated Kubernetes APIs](https://v2.helm.sh/docs/using_helm/#deprecated-kubernetes-apis) docs and Helm [mapkubeapis plugin](https://github.com/hickeyma/helm-mapkubeapis) for more details.
+- Upgrade Kubernetes clusters to [supported versions](https://kubernetes.io/docs/setup/release/version-skew-policy/).
+
 ## Install
 
 Based on the version in `plugin.yaml`, release binary will be downloaded from GitHub:
