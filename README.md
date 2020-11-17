@@ -130,7 +130,7 @@ $ helm 2to3 move config
 
 - After running the command, check that all Helm v2 plugins work fine with the Helm v3. If any issue with a plugin, remove it (`<helm3> plugin remove`) and
 re-add (`<helm3> plugin install`) it as required.
-- The repository file `repositories.yaml` is copied to Helm v3 which contains references to repositories added in Helm v2. Local respoitories are not copied to Helm v3.
+- The repository file `repositories.yaml` is copied to Helm v3 which contains references to repositories added in Helm v2. Local repositories are not copied to Helm v3.
 You should remove all local repositories from Helm v3 using `<helm3> repo remove` and re-add where necessary using `<helm3> repo add`. This is a necessary refresh to align references
 for Helm v3.
 - When you are happy with your repository list, update the Helm v3 repo `<helm3> repo update`. This cleans up any Helm v2 cache references from Helm v3.
@@ -231,7 +231,7 @@ Update Complete. ⎈Happy Helming!⎈
 Error: open /home/usr1/.cache/helm/repository/local-index.yaml: no such file or directory
 ```
 
-A. Local respoitories are not copied to Helm v3. You therefore need to remove all local repositories from Helm v3 using `<helm3> repo remove` and re-add where
+A. Local repositories are not copied to Helm v3. You therefore need to remove all local repositories from Helm v3 using `<helm3> repo remove` and re-add where
 required using `<helm3> repo add`. This is a necessary refresh to align references for Helm v3 and remove the conflict. It is worthwhile to also refresh the
 repository list afterwards: `<helm3> repo update`. You should then be able to run the chart dependency update command successfully.
 
