@@ -1,6 +1,6 @@
 module github.com/helm/helm-2to3
 
-go 1.13
+go 1.15
 
 require (
 	github.com/Masterminds/semver v1.5.0 // indirect
@@ -11,9 +11,9 @@ require (
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
-	helm.sh/helm/v3 v3.3.0
-	k8s.io/apimachinery v0.18.8
-	k8s.io/helm v2.16.10+incompatible
+	helm.sh/helm/v3 v3.4.2
+	k8s.io/apimachinery v0.19.4
+	k8s.io/helm v2.17.0+incompatible
 )
 
 replace (
