@@ -36,7 +36,7 @@ import (
 	common "github.com/helm/helm-2to3/pkg/common"
 )
 
-// CreateRelease create a v3 release object from v3 release object
+// CreateRelease create a v3 release object from v2 release object
 func CreateRelease(v2Rel *v2rls.Release) (*release.Release, error) {
 	if v2Rel.Chart == nil || v2Rel.Info == nil {
 		return nil, fmt.Errorf("No v2 chart or info metadata")
