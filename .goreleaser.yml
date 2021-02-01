@@ -10,13 +10,14 @@ builds:
     goarch:
       - amd64
       - arm64
-archive:
-  format: tar.gz
-  files:
-    - README.md
-    - LICENSE
-    - plugin.yaml
-    - completion.yaml
-    - scripts/install_plugin.sh
+archives:
+  - id: archive
+    format: tar.gz
+    files:
+      - README.md
+      - LICENSE
+      - plugin.yaml
+      - completion.yaml
+      - scripts/install_plugin.sh
 checksum:
   name_template: 'checksums.txt'
