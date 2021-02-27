@@ -27,11 +27,15 @@ import (
 	common "github.com/helm/helm-2to3/pkg/common"
 	v2 "github.com/helm/helm-2to3/pkg/v2"
 	v3 "github.com/helm/helm-2to3/pkg/v3"
+
+	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
 var (
 	deletev2Releases   bool
 	maxReleaseVersions int
+	// new variable to ignore already migrated releases
+	ignoreAlreadyMigrated bool
 )
 
 type ConvertOptions struct {
@@ -43,6 +47,8 @@ type ConvertOptions struct {
 	TillerLabel        string
 	TillerNamespace    string
 	TillerOutCluster   bool
+	// new struct field to ignore already migrated releases
+	IgnoreAlreadyMigrated bool
 }
 
 func newConvertCmd(out io.Writer) *cobra.Command {
@@ -64,6 +70,7 @@ func newConvertCmd(out io.Writer) *cobra.Command {
 
 	flags.BoolVar(&deletev2Releases, "delete-v2-releases", false, "v2 release versions are deleted after migration. By default, the v2 release versions are retained")
 	flags.IntVar(&maxReleaseVersions, "release-versions-max", 10, "limit the maximum number of versions converted per release. Use 0 for no limit")
+	flags.BoolVarP(&ignoreAlreadyMigrated, "ignore-already-migrated", "e", false, "Ignore the already migrated releases to provide idempotency")
 
 	return cmd
 
@@ -83,6 +90,9 @@ func runConvert(cmd *cobra.Command, args []string) error {
 		TillerLabel:        settings.Label,
 		TillerNamespace:    settings.TillerNamespace,
 		TillerOutCluster:   settings.TillerOutCluster,
+
+		// put the variable to struct
+		IgnoreAlreadyMigrated: ignoreAlreadyMigrated,
 	}
 	kubeConfig := common.KubeConfig{
 		Context: settings.KubeContext,
@@ -141,6 +151,14 @@ func Convert(convertOptions ConvertOptions, kubeConfig common.KubeConfig) error 
 		log.Printf("[Helm 3] ReleaseVersion \"%s\" will be created.\n", relVerName)
 		if !convertOptions.DryRun {
 			if err := createV3ReleaseVersion(v2Release, kubeConfig); err != nil {
+
+				if convertOptions.IgnoreAlreadyMigrated {
+					if driver.ErrReleaseExists.Error() == err.Error() {
+						log.Printf("[Warning Helm 3] Release \"%s\" already exists.\n", relVerName)
+						continue
+					}
+				}
+
 				return err
 			}
 			log.Printf("[Helm 3] ReleaseVersion \"%s\" created.\n", relVerName)
