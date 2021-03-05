@@ -29,7 +29,7 @@ jobs:
     working_directory: /go/src/github.com/helm/helm-2to3
     steps:
       - checkout
-      - run: curl -sL https://git.io/goreleaser | bash
+      - run: curl -sL https://raw.githubusercontent.com/goreleaser/get/master/get | VERSION=v0.155.0 bash
 workflows:
   version: 2
   untagged-build:
