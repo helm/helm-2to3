@@ -11,7 +11,11 @@ echo "Downloading and installing helm-2to3 v${version} ..."
 
 url=""
 if [ "$(uname)" = "Darwin" ]; then
-    url="https://github.com/helm/helm-2to3/releases/download/v${version}/helm-2to3_${version}_darwin_amd64.tar.gz"
+    if [ "$(uname -m)" = "arm64" ]; then
+        url="https://github.com/helm/helm-2to3/releases/download/v${version}/helm-2to3_${version}_darwin_arm64.tar.gz"
+    else
+        url="https://github.com/helm/helm-2to3/releases/download/v${version}/helm-2to3_${version}_darwin_amd64.tar.gz"
+    fi
 elif [ "$(uname)" = "Linux" ] ; then
     if [ "$(uname -m)" = "aarch64" ] || [ "$(uname -m)" = "arm64" ]; then
         url="https://github.com/helm/helm-2to3/releases/download/v${version}/helm-2to3_${version}_linux_arm64.tar.gz"
