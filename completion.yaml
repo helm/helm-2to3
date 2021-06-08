@@ -18,6 +18,7 @@ commands:
   flags:
   - delete-v2-releases
   - dry-run
+  - ignore-already-migrated
   - l
   - label
   - s
