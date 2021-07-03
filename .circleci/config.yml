@@ -12,7 +12,7 @@ jobs:
             shellcheck -x scripts/install_plugin.sh
   untagged-build:
     docker:
-      - image: circleci/golang:1.15
+      - image: circleci/golang:1.16
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -22,14 +22,14 @@ jobs:
       - run: make build
   tagged-build:
     docker:
-      - image: circleci/golang:1.15
+      - image: circleci/golang:1.16
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
     working_directory: /go/src/github.com/helm/helm-2to3
     steps:
       - checkout
-      - run: curl -sL https://raw.githubusercontent.com/goreleaser/get/master/get | VERSION=v0.155.0 bash
+      - run: curl -sL https://raw.githubusercontent.com/goreleaser/get/master/get | VERSION=v0.158.0 bash
 workflows:
   version: 2
   untagged-build:

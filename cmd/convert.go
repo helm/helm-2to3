@@ -27,22 +27,27 @@ import (
 	common "github.com/helm/helm-2to3/pkg/common"
 	v2 "github.com/helm/helm-2to3/pkg/v2"
 	v3 "github.com/helm/helm-2to3/pkg/v3"
+
+	"helm.sh/helm/v3/pkg/storage/driver"
 )
 
 var (
 	deletev2Releases   bool
 	maxReleaseVersions int
+	// new variable to ignore already migrated releases
+	ignoreAlreadyMigrated bool
 )
 
 type ConvertOptions struct {
-	DeleteRelease      bool
-	DryRun             bool
-	MaxReleaseVersions int
-	ReleaseName        string
-	StorageType        string
-	TillerLabel        string
-	TillerNamespace    string
-	TillerOutCluster   bool
+	DeleteRelease         bool
+	DryRun                bool
+	MaxReleaseVersions    int
+	ReleaseName           string
+	StorageType           string
+	TillerLabel           string
+	TillerNamespace       string
+	TillerOutCluster      bool
+	IgnoreAlreadyMigrated bool
 }
 
 func newConvertCmd(out io.Writer) *cobra.Command {
@@ -64,6 +69,7 @@ func newConvertCmd(out io.Writer) *cobra.Command {
 
 	flags.BoolVar(&deletev2Releases, "delete-v2-releases", false, "v2 release versions are deleted after migration. By default, the v2 release versions are retained")
 	flags.IntVar(&maxReleaseVersions, "release-versions-max", 10, "limit the maximum number of versions converted per release. Use 0 for no limit")
+	flags.BoolVar(&ignoreAlreadyMigrated, "ignore-already-migrated", false, "Ignore any already migrated release versions and continue migrating")
 
 	return cmd
 
@@ -75,14 +81,15 @@ func runConvert(cmd *cobra.Command, args []string) error {
 		return errors.New("release-storage flag needs to be 'configmaps' or 'secrets'")
 	}
 	convertOptions := ConvertOptions{
-		DeleteRelease:      deletev2Releases,
-		DryRun:             settings.DryRun,
-		MaxReleaseVersions: maxReleaseVersions,
-		ReleaseName:        releaseName,
-		StorageType:        settings.ReleaseStorage,
-		TillerLabel:        settings.Label,
-		TillerNamespace:    settings.TillerNamespace,
-		TillerOutCluster:   settings.TillerOutCluster,
+		DeleteRelease:         deletev2Releases,
+		DryRun:                settings.DryRun,
+		MaxReleaseVersions:    maxReleaseVersions,
+		ReleaseName:           releaseName,
+		StorageType:           settings.ReleaseStorage,
+		TillerLabel:           settings.Label,
+		TillerNamespace:       settings.TillerNamespace,
+		TillerOutCluster:      settings.TillerOutCluster,
+		IgnoreAlreadyMigrated: ignoreAlreadyMigrated,
 	}
 	kubeConfig := common.KubeConfig{
 		Context: settings.KubeContext,
@@ -141,6 +148,14 @@ func Convert(convertOptions ConvertOptions, kubeConfig common.KubeConfig) error 
 		log.Printf("[Helm 3] ReleaseVersion \"%s\" will be created.\n", relVerName)
 		if !convertOptions.DryRun {
 			if err := createV3ReleaseVersion(v2Release, kubeConfig); err != nil {
+
+				if convertOptions.IgnoreAlreadyMigrated {
+					if driver.ErrReleaseExists.Error() == err.Error() {
+						log.Printf("[Helm 3] ReleaseVersion \"%s\" already exists.\n", relVerName)
+						continue
+					}
+				}
+
 				return err
 			}
 			log.Printf("[Helm 3] ReleaseVersion \"%s\" created.\n", relVerName)
