@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+# It is important to quote the $@ variable since the last parameter
+# could be empty, which indicates that the prefix to complete is empty.
+# For example:
+#   helm 2to3 convert <TAB>
+# compared to
+#   helm 2to3 convert ngi<TAB>
+$HELM_PLUGIN_DIR/bin/2to3 __complete "$@"

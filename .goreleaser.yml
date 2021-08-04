@@ -17,7 +17,7 @@ archives:
       - README.md
       - LICENSE
       - plugin.yaml
-      - completion.yaml
+      - plugin.complete
       - scripts/install_plugin.sh
 checksum:
   name_template: 'checksums.txt'

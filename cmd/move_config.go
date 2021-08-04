@@ -36,7 +36,8 @@ func newMoveConfigCmd(out io.Writer) *cobra.Command {
 			}
 			return nil
 		},
-		RunE: runMove,
+		ValidArgs: []string{"config"},
+		RunE:      runMove,
 	}
 
 	flags := cmd.Flags()
