@@ -203,7 +203,7 @@ func mapConfig(v2Config *v2chart.Config) (map[string]interface{}, error) {
 }
 
 func mapFiles(v2Files []*any.Any) []*chart.File {
-	if mapFiles == nil {
+	if v2Files == nil {
 		return nil
 	}
 	files := []*chart.File{}
