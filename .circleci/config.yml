@@ -12,7 +12,7 @@ jobs:
             shellcheck -x scripts/install_plugin.sh
   untagged-build:
     docker:
-      - image: circleci/golang:1.16
+      - image: circleci/golang:1.17
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -22,7 +22,7 @@ jobs:
       - run: make build
   tagged-build:
     docker:
-      - image: circleci/golang:1.16
+      - image: circleci/golang:1.17
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
