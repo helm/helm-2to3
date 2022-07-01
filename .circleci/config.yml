@@ -33,7 +33,9 @@ jobs:
     working_directory: /go/src/github.com/helm/helm-2to3
     steps:
       - checkout
-      - run: make build
+      - run: 
+        command: make build
+        no_output_timeout: 20m
   tagged-build:
     docker:
       - image: circleci/golang:1.17
@@ -43,5 +45,6 @@ jobs:
     working_directory: /go/src/github.com/helm/helm-2to3
     steps:
       - checkout
-      - run: curl -sfL https://goreleaser.com/static/run | bash
-        no_output_timeout: 30m
+      - run: 
+        command: curl -sfL https://goreleaser.com/static/run | bash
+        no_output_timeout: 40m
