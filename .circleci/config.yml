@@ -30,7 +30,6 @@ jobs:
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-    working_directory: $HOME/go/src/github.com/helm/helm-2to3
     steps:
       - checkout
       - run: 
