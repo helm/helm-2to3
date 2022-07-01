@@ -34,8 +34,8 @@ jobs:
     steps:
       - checkout
       - run: 
-        command: make build
-        no_output_timeout: 20m
+          command: make build
+          no_output_timeout: 20m
   tagged-build:
     docker:
       - image: circleci/golang:1.17
@@ -46,5 +46,5 @@ jobs:
     steps:
       - checkout
       - run: 
-        command: curl -sfL https://goreleaser.com/static/run | bash
-        no_output_timeout: 40m
+          command: curl -sfL https://goreleaser.com/static/run | bash
+          no_output_timeout: 40m
