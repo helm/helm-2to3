@@ -60,6 +60,29 @@ by the Helm v2 client instance. [Clean up](#clean-up-helm-v2-data) should only b
 - Access to the cluster(s) that Helm v2 client is managing and which Helm v3 will manage after migration. This access is similar to `kubectl` access using [kubeconfig files](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/).
   The `--kubeconfig` and `--kube-context` flags can be used with the `convert` and `cleanup` commands to set the kubeconfig path and context to override the environment configuration.
 - Access to the `tiller` namespace for required RBAC roles. If `Tillerless` setup, then a service account with the proper cluster wide RBAC roles will need to be used. If not used, `forbidden` errors will be thrown when trying to access restricted resources.
+  - The plugin requires these RBAC resource permissions at the least. Additional resources might be needed depending on your environment setup
+    ```yaml
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: <your-helm-cluster-role-name>
+    rules:
+    - apiGroups:
+        - ""
+      resources:
+        - pods
+      verbs:
+        - list
+        - get
+    - apiGroups:
+        - ""
+      resources:
+        - configmaps
+      verbs:
+        - list
+        - get
+        - delete
+    ```
 
 ## Recommended Prior to Migration
 
