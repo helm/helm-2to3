@@ -292,7 +292,7 @@ $ kubectl get configmap -n kube-system -l "OWNER=TILLER" \
 
 If you would like to handle the build yourself, this is the recommended way to do it.
 
-You must first have [Go v1.17](http://golang.org) installed, and then you run:
+You must first have [Go v1.18](http://golang.org) installed, and then you run:
 
 ```console
 $ git clone git@github.com:helm/helm-2to3.git
