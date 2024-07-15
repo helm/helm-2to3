@@ -3,6 +3,7 @@ builds:
     binary: 2to3
     env:
       - CGO_ENABLED=0
+      - GITHUB_TOKEN: ${{ secrets.GO_RELEASER_TOKEN }}
     goos:
       - darwin
       - linux
