@@ -4,9 +4,15 @@ workflows:
   untagged-build:
     jobs:
       - lint
+      - untagged-build
   tagged-build:
     jobs:
-      - lint
+      - tagged-build:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
 jobs:
   lint:
     docker:
@@ -18,3 +24,25 @@ jobs:
           command: |
             shellcheck -x scripts/tag.sh
             shellcheck -x scripts/install_plugin.sh
+  untagged-build:
+    docker:
+      - image: cimg/go:1.22
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    steps:
+      - checkout
+      - run:
+          command: make build
+          no_output_timeout: 20m
+  tagged-build:
+    docker:
+      - image: cimg/go:1.22
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    steps:
+      - checkout
+      - run:
+          command: curl -sfL https://goreleaser.com/static/run | bash
+          no_output_timeout: 40m
