@@ -1,16 +1,16 @@
 module github.com/helm/helm-2to3
 
-go 1.18
+go 1.22
 
 require (
-	github.com/golang/protobuf v1.5.3
+	github.com/golang/protobuf v1.5.4
 	github.com/maorfr/helm-plugin-utils v0.6.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/pkg/errors v0.9.1
-	github.com/spf13/cobra v1.5.0
+	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
-	helm.sh/helm/v3 v3.10.3
-	k8s.io/apimachinery v0.25.2
+	helm.sh/helm/v3 v3.15.3
+	k8s.io/apimachinery v0.30.0
 	k8s.io/helm v2.17.0+incompatible
 )
 
