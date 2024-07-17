@@ -1,3 +1,6 @@
+|![](https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Warning.svg/156px-Warning.svg.png) | This project is no longer supported.
+|---|---|
+
 # Helm 2to3 Plugin
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -6,6 +9,10 @@
 [![Release](https://img.shields.io/github/release/helm/helm-2to3.svg?style=flat-square)](https://github.com/helm/helm-2to3/releases/latest)
 
 ![diagram](./helm-2to3.png)
+
+## ⚠️ Deprecation and Archive Notice
+
+The `2to3` plugin is deprecated and no longer supported. Helm 3 was released ion November 2019 and Helm 2 became unsupported in November 2020. It would be expected that all users should be migrated to Helm 3 by this time. Therefore, the plugin has now been deprecated by the maintainers.
 
 **Helm v3 plugin which migrates and cleans up Helm v2 configuration and releases in-place to Helm v3**
 
