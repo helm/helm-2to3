@@ -10,11 +10,11 @@
 
 ![diagram](./helm-2to3.png)
 
+**Helm v3 plugin which migrates and cleans up Helm v2 configuration and releases in-place to Helm v3**
+
 ## ⚠️ Deprecation and Archive Notice
 
-The `2to3` plugin is deprecated and no longer supported. Helm 3 was released ion November 2019 and Helm 2 became unsupported in November 2020. It would be expected that all users should be migrated to Helm 3 by this time. Therefore, the plugin has now been deprecated by the maintainers.
-
-**Helm v3 plugin which migrates and cleans up Helm v2 configuration and releases in-place to Helm v3**
+The `2to3` plugin is deprecated and no longer supported. Helm 3 was released in November 2019 and Helm 2 became unsupported in November 2020. It would be expected that all users should be migrated to Helm 3 by this time. Therefore, the plugin has now been deprecated by the maintainers.
 
 ## Overview
 
